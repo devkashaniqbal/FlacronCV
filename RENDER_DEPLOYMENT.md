@@ -43,7 +43,7 @@ Create each service manually:
    - **Runtime**: Node
    - **Build Command**:
      ```bash
-     corepack enable && corepack prepare pnpm@8.15.0 --activate && pnpm install && pnpm build:api
+     npm install -g pnpm@8.15.0 && pnpm install && pnpm build:api
      ```
    - **Start Command**:
      ```bash
@@ -65,7 +65,7 @@ Create each service manually:
    - **Runtime**: Node
    - **Build Command**:
      ```bash
-     corepack enable && corepack prepare pnpm@8.15.0 --activate && pnpm install && pnpm build:web
+     npm install -g pnpm@8.15.0 && pnpm install && pnpm build:web
      ```
    - **Start Command**:
      ```bash
@@ -205,8 +205,12 @@ After deployment:
 
 **Solution**: Ensure your build command includes:
 ```bash
-corepack enable && corepack prepare pnpm@8.15.0 --activate
+npm install -g pnpm@8.15.0
 ```
+
+### Build Fails with "EROFS: read-only file system" (corepack error)
+
+**Solution**: Use `npm install -g pnpm@8.15.0` instead of corepack, as Render's build environment has a read-only `/usr/bin` directory.
 
 ### Build Fails with "Cannot find module"
 
