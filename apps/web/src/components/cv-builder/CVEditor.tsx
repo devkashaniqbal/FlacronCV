@@ -31,7 +31,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useState } from 'react';
-import { CVSection, CVSectionType, CVSectionItem } from '@flacroncv/shared-types';
+import { CVSection, CVSectionType, CVSectionItem, SkillLevel } from '@flacroncv/shared-types';
 import { cn } from '@/lib/utils';
 
 export default function CVEditor() {
@@ -365,7 +365,7 @@ function createDefaultItem(type: string): CVSectionItem {
     case 'education':
       return { id, institution: '', degree: '', field: '', location: '', startDate: '', endDate: null, gpa: '', description: '', order: 0 };
     case 'skills':
-      return { id, name: '', level: 'intermediate', category: '', order: 0 };
+      return { id, name: '', level: SkillLevel.INTERMEDIATE, category: '', order: 0 };
     case 'projects':
       return { id, name: '', description: '', url: '', technologies: [], startDate: '', endDate: null, order: 0 };
     case 'certifications':
