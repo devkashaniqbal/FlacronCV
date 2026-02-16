@@ -484,6 +484,7 @@ export default function CoverLetterEditorPage() {
 // Helper to get auth token for export
 async function getToken(): Promise<string> {
   const { auth } = await import('@/lib/firebase');
+  if (!auth) return '';
   const user = auth.currentUser;
   if (!user) return '';
   return user.getIdToken();
