@@ -31,7 +31,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useState } from 'react';
-import { CVSection, CVSectionType } from '@flacroncv/shared-types';
+import { CVSection, CVSectionType, CVSectionItem } from '@flacroncv/shared-types';
 import { cn } from '@/lib/utils';
 
 export default function CVEditor() {
@@ -357,7 +357,7 @@ function AddSectionButton() {
   );
 }
 
-function createDefaultItem(type: string): Record<string, unknown> {
+function createDefaultItem(type: string): CVSectionItem {
   const id = crypto.randomUUID();
   switch (type) {
     case 'experience':
