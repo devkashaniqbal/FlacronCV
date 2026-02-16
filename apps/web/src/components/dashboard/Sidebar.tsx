@@ -68,8 +68,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          'fixed inset-y-0 start-0 z-50 flex w-64 flex-col border-e border-stone-200 bg-white transition-transform lg:static lg:transtone-x-0 dark:border-stone-700 dark:bg-stone-900',
-          open ? 'transtone-x-0' : '-transtone-x-full',
+          'fixed inset-y-0 start-0 z-50 flex w-64 flex-col border-e border-stone-200 bg-white transition-transform lg:static lg:translate-x-0 dark:border-stone-700 dark:bg-stone-900',
+          open ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         {/* Logo */}
