@@ -15,10 +15,11 @@ async function bootstrap() {
   app.use(helmet());
 
   // CORS configuration - allow both development and production origins
+  const frontendUrl = process.env.FRONTEND_URL?.replace(/\/$/, ''); // Remove trailing slash
   const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001',
-    process.env.FRONTEND_URL,
+    frontendUrl,
   ].filter(Boolean); // Remove undefined values
 
   app.enableCors({
