@@ -384,7 +384,9 @@
   },
   "support": {
     "title": "Support",
+    "description": "Get help with your account, billing, or technical issues",
     "new_ticket": "New Ticket",
+    "newTicket": "New Ticket",
     "subject": "Subject",
     "category": "Category",
     "priority": "Priority",
@@ -392,7 +394,9 @@
     "submit": "Submit Ticket",
     "submitted": "Ticket submitted",
     "empty_title": "No support tickets",
-    "empty_description": "Need help? Create a support ticket"
+    "emptyTitle": "No support tickets",
+    "empty_description": "Need help? Create a support ticket",
+    "emptyDescription": "Need help? Create a support ticket"
   },
   "admin": {
     "title": "Admin Panel",
