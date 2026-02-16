@@ -187,7 +187,7 @@ export default function AdminAuditLogsPage() {
                     <tr key={`${log.id}-expanded`}>
                       <td colSpan={6} className="bg-stone-50 px-6 py-4 dark:bg-stone-800/50">
                         <div className="grid gap-4 sm:grid-cols-2">
-                          {log.changes.before && (
+                          {!!log.changes.before && (
                             <div>
                               <p className="mb-2 text-xs font-semibold uppercase text-red-500">
                                 Before
@@ -197,7 +197,7 @@ export default function AdminAuditLogsPage() {
                               </pre>
                             </div>
                           )}
-                          {log.changes.after && (
+                          {!!log.changes.after && (
                             <div>
                               <p className="mb-2 text-xs font-semibold uppercase text-emerald-500">
                                 After
