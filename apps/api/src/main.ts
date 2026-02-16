@@ -20,7 +20,7 @@ async function bootstrap() {
     'http://localhost:3000',
     'http://localhost:3001',
     frontendUrl,
-  ].filter(Boolean); // Remove undefined values
+  ].filter(Boolean) as string[]; // Type assertion: filter removes undefined values
 
   app.enableCors({
     origin: (origin, callback) => {
