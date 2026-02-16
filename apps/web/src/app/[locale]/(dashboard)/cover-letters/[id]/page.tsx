@@ -56,6 +56,7 @@ export default function CoverLetterEditorPage() {
     setCoverLetter,
     setContent,
     updateField,
+    updateStyling,
     setSaving,
     setLastSavedAt,
     reset,
@@ -427,7 +428,7 @@ export default function CoverLetterEditorPage() {
               {/* Font Family Selector */}
               <select
                 value={coverLetter.styling?.fontFamily || 'Inter'}
-                onChange={(e) => updateMutation.mutate({ styling: { fontFamily: e.target.value } })}
+                onChange={(e) => updateStyling('fontFamily', e.target.value)}
                 className="text-xs rounded px-2 py-1 bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 text-stone-700 dark:text-stone-300"
                 title="Font Family"
               >
@@ -443,7 +444,7 @@ export default function CoverLetterEditorPage() {
               {/* Font Size Selector */}
               <select
                 value={coverLetter.styling?.fontSize || '16px'}
-                onChange={(e) => updateMutation.mutate({ styling: { fontSize: e.target.value } })}
+                onChange={(e) => updateStyling('fontSize', e.target.value)}
                 className="text-xs rounded px-2 py-1 bg-white dark:bg-stone-700 border border-stone-300 dark:border-stone-600 text-stone-700 dark:text-stone-300"
                 title="Font Size"
               >
