@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(findstr:*)",
+      "Bash(pnpm install:*)",
+      "Bash(where:*)",
+      "Bash(node --version:*)",
+      "Bash(npm:*)",
+      "Bash(export PATH=\"$PATH:/c/Users/pc/AppData/Roaming/npm\")",
+      "Bash(pnpm:*)",
+      "Bash(netstat:*)",
+      "Bash(curl:*)",
+      "Bash(find:*)",
+      "Bash(echo:*)",
+      "Bash(node -e:*)",
+      "Bash(timeout:*)",
+      "Bash(ping:*)",
+      "Bash(c:/Users/pc/Desktop/FlacronCV/node_modules/.bin/tsc:*)",
+      "Bash(ls:*)",
+      "Bash(pushd:*)",
+      "Bash(popd:*)",
+      "Bash(node:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(python -m json.tool:*)",
+      "Bash(python:*)",
+      "Bash(tasklist:*)",
+      "Bash(for:*)",
+      "Bash(do cp apps/web/public/locales/en/common.json apps/web/public/locales/$lang/common.json)",
+      "Bash(done)",
+      "Bash(wc:*)",
+      "Bash(.gitignore:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git reset:*)"
+    ]
+  }
+}
