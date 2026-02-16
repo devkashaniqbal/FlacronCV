@@ -8,9 +8,10 @@ interface CardProps {
   className?: string;
   hover?: boolean;
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  onClick?: () => void;
 }
 
-export default function Card({ children, className, hover = false, padding = 'md' }: CardProps) {
+export default function Card({ children, className, hover = false, padding = 'md', onClick }: CardProps) {
   const paddings = { none: '', sm: 'p-4', md: 'p-6', lg: 'p-8' };
 
   return (
@@ -21,6 +22,7 @@ export default function Card({ children, className, hover = false, padding = 'md
         paddings[padding],
         className,
       )}
+      onClick={onClick}
     >
       {children}
     </div>
