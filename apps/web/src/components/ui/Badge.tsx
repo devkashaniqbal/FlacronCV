@@ -6,9 +6,10 @@ interface BadgeProps {
   children: React.ReactNode;
   variant?: 'default' | 'success' | 'warning' | 'danger' | 'info' | 'brand';
   size?: 'sm' | 'md';
+  className?: string;
 }
 
-export default function Badge({ children, variant = 'default', size = 'sm' }: BadgeProps) {
+export default function Badge({ children, variant = 'default', size = 'sm', className }: BadgeProps) {
   const variants = {
     default: 'bg-stone-100 text-stone-700 dark:bg-stone-700 dark:text-stone-300',
     success: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
@@ -24,7 +25,7 @@ export default function Badge({ children, variant = 'default', size = 'sm' }: Ba
   };
 
   return (
-    <span className={cn('inline-flex items-center rounded-full font-medium', variants[variant], sizes[size])}>
+    <span className={cn('inline-flex items-center rounded-full font-medium', variants[variant], sizes[size], className)}>
       {children}
     </span>
   );
