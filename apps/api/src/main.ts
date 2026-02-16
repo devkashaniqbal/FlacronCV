@@ -14,7 +14,7 @@ async function bootstrap() {
 
   app.use(helmet());
 
-  // CORS configuration - allow both development and production origins
+  // CORS configuration - dynamically validate origins
   const frontendUrl = process.env.FRONTEND_URL?.replace(/\/$/, ''); // Remove trailing slash
   const allowedOrigins = [
     'http://localhost:3000',
@@ -23,7 +23,26 @@ async function bootstrap() {
   ].filter(Boolean); // Remove undefined values
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Normalize origin by removing trailing slash
+      const normalizedOrigin = origin.replace(/\/$/, '');
+
+      // Check if normalized origin is in allowed list
+      const isAllowed = allowedOrigins.some(
+        (allowed) => allowed === normalizedOrigin || `${allowed}/` === origin
+      );
+
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Language'],
