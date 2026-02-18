@@ -9,6 +9,7 @@
     "features": "Features",
     "pricing": "Pricing",
     "faq": "FAQ",
+    "templates": "Templates",
     "login": "Log In",
     "signup": "Get Started Free",
     "dashboard": "Dashboard",
@@ -16,26 +17,41 @@
   },
   "hero": {
     "title": "Build Your Perfect CV with AI",
-    "subtitle": "Create stunning, ATS-friendly CVs and cover letters in minutes. Powered by AI, designed for success.",
+    "subtitle": "Create stunning, ATS-friendly CVs and cover letters in minutes. Powered by IBM & Microsoft, designed for success.",
     "cta_primary": "Start Building For Free",
     "cta_secondary": "See How It Works",
     "trusted": "Trusted by 10,000+ professionals worldwide"
+  },
+  "how_it_works": {
+    "title": "Get Your CV Ready in 3 Steps",
+    "subtitle": "From blank page to job-ready in minutes",
+    "step1_title": "Fill in your details",
+    "step1_desc": "Add your experience, education, and skills — or paste content from your existing CV.",
+    "step2_title": "Choose a template",
+    "step2_desc": "Pick from ATS-friendly templates designed for your industry and career level.",
+    "step3_title": "Generate & export",
+    "step3_desc": "Let AI polish your bullet points and cover letter, then download as PDF or DOCX.",
+    "cta": "Start Building Free"
   },
   "features": {
     "title": "Everything You Need to Land Your Dream Job",
     "subtitle": "Powerful tools designed to make your job application process effortless",
     "ai_writing": "AI Writing Assistant",
-    "ai_writing_desc": "Let AI craft compelling bullet points, summaries, and cover letters tailored to your target role",
+    "ai_writing_desc": "AI writes compelling bullet points, summaries, and cover letters for your target role.",
     "templates": "Professional Templates",
-    "templates_desc": "Choose from dozens of ATS-friendly templates designed by HR professionals",
+    "templates_desc": "Dozens of ATS-friendly templates designed by HR professionals.",
     "multilingual": "Multilingual Support",
-    "multilingual_desc": "Create CVs and cover letters in 6 languages with AI-powered translation",
+    "multilingual_desc": "Create CVs and cover letters in 6 languages with AI translation.",
     "export": "Multiple Export Formats",
-    "export_desc": "Download your documents as PDF or DOCX, perfectly formatted every time",
+    "export_desc": "Download as PDF or DOCX, perfectly formatted every time.",
     "drag_drop": "Drag & Drop Builder",
-    "drag_drop_desc": "Intuitive drag-and-drop interface to customize your CV sections",
+    "drag_drop_desc": "Rearrange CV sections instantly with a simple drag-and-drop.",
     "ats": "ATS Optimization",
-    "ats_desc": "Score your CV against job descriptions to maximize your chances"
+    "ats_desc": "Score your CV against job descriptions and fix weak spots instantly.",
+    "ats_score": "ATS Score Checker",
+    "ats_score_desc": "Paste a job posting and get your match score before you apply.",
+    "role_based": "Role-Based Suggestions",
+    "role_based_desc": "Get tailored bullet-point suggestions based on your job title and industry."
   },
   "pricing": {
     "title": "Simple, Transparent Pricing",
@@ -52,22 +68,23 @@
     "upgrade": "Upgrade Now",
     "contact_sales": "Contact Sales",
     "per_month": "/month",
-    "per_year": "/year"
+    "per_year": "/year",
+    "billed_annually": "billed annually"
   },
   "faq": {
     "title": "Frequently Asked Questions",
     "q1": "Is FlacronCV really free?",
-    "a1": "Yes! Our free plan lets you create 1 CV and 1 cover letter with basic templates. Upgrade to Pro for unlimited access.",
-    "q2": "Can I export my CV as PDF?",
-    "a2": "Absolutely! All plans support PDF export. Pro and Enterprise plans also support DOCX format.",
+    "a1": "Yes! The Free plan lets you create up to 5 CVs, 1 cover letter, use 5 AI credits/month, and export up to 2 documents/month as PDF — no credit card required. Upgrade to Pro for 10 CVs, 20 cover letters, 100 AI credits, unlimited exports, and DOCX format.",
+    "q2": "What export formats are supported?",
+    "a2": "All plans support PDF export. Pro and Enterprise plans also unlock DOCX (Microsoft Word) format. The Free plan includes 2 exports/month; Pro and Enterprise offer unlimited exports. TXT export is not currently available.",
     "q3": "How does the AI writing work?",
     "a3": "Our AI analyzes your experience and the job description to generate tailored content. It uses advanced language models to create professional, impactful text.",
     "q4": "Is my data secure?",
-    "a4": "Yes. We use enterprise-grade encryption, and your data is stored securely on Firebase. We are GDPR compliant and never share your information.",
+    "a4": "Yes. All data is encrypted in transit (TLS) and at rest (AES-256). We are GDPR compliant, we never sell your data to third parties, and you can request complete deletion of your account and all associated files at any time from your account settings.",
     "q5": "Can I cancel my subscription anytime?",
-    "a5": "Yes, you can cancel anytime. Your subscription will remain active until the end of your billing period.",
+    "a5": "Yes, you can cancel anytime from your billing settings — no questions asked. Your subscription stays active until the end of the current billing period, and you will not be charged again.",
     "q6": "What languages are supported?",
-    "a6": "FlacronCV supports English, Spanish, French, German, Arabic, and Urdu for both the interface and CV content."
+    "a6": "FlacronCV currently supports English, Spanish, French, German, Arabic, and Urdu — for both the app interface and your CV content. More languages (including Portuguese, Italian, and Chinese) are coming soon."
   },
   "testimonials": {
     "title": "Loved by Professionals Worldwide",

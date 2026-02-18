@@ -29,7 +29,7 @@ export default function Hero() {
           {/* Badge */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-700 dark:border-brand-800 dark:bg-brand-950/50 dark:text-brand-300">
             <Sparkles className="h-4 w-4" />
-            Powered by AI
+            Powered by IBM &amp; Microsoft
           </div>
 
           {/* Headline */}

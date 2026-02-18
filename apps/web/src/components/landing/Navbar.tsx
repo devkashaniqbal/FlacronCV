@@ -36,6 +36,9 @@ export default function Navbar() {
           <a href="#pricing" className="text-sm font-medium text-stone-600 hover:text-brand-600 transition-colors dark:text-stone-400">
             {t('nav.pricing')}
           </a>
+          <Link href="/templates" className="text-sm font-medium text-stone-600 hover:text-brand-600 transition-colors dark:text-stone-400">
+            {t('nav.templates')}
+          </Link>
           <a href="#faq" className="text-sm font-medium text-stone-600 hover:text-brand-600 transition-colors dark:text-stone-400">
             {t('nav.faq')}
           </a>
@@ -85,6 +88,9 @@ export default function Navbar() {
             <a href="#pricing" className="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-400" onClick={() => setMobileOpen(false)}>
               {t('nav.pricing')}
             </a>
+            <Link href="/templates" className="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-400" onClick={() => setMobileOpen(false)}>
+              {t('nav.templates')}
+            </Link>
             <a href="#faq" className="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-400" onClick={() => setMobileOpen(false)}>
               {t('nav.faq')}
             </a>

@@ -21,19 +21,24 @@ const RTL_LOCALES = ['ar', 'ur'];
 
 export const metadata: Metadata = {
   title: {
-    default: 'FlacronCV - AI-Powered CV & Cover Letter Builder',
+    default: 'FlacronCV – AI-Powered CV & Cover Letter Builder',
     template: '%s | FlacronCV',
   },
   description:
-    'Create professional CVs and cover letters with AI assistance. Multiple templates, multilingual support, ATS optimization.',
+    'Create ATS-optimized CVs and cover letters in minutes using AI. Professional templates, PDF & DOCX export, multilingual support. Free to start.',
   keywords: [
     'CV builder',
     'resume builder',
-    'cover letter',
-    'AI',
+    'cover letter generator',
+    'AI CV',
+    'ATS optimization',
     'professional CV',
     'job application',
+    'free resume builder',
   ],
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://flacroncv-web.onrender.com',
+  ),
 };
 
 export default async function LocaleLayout({

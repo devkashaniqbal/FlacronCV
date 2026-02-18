@@ -1,10 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Sparkles, Layout, Globe, Download, GripVertical, Target } from 'lucide-react';
+import { Sparkles, Layout, Globe, Download, GripVertical, Target, BarChart2, Lightbulb } from 'lucide-react';
 import { useInView } from '@/hooks/useInView';
-
-const featureIcons = [Sparkles, Layout, Globe, Download, GripVertical, Target];
 
 export default function Features() {
   const t = useTranslations();
@@ -18,6 +16,8 @@ export default function Features() {
     { icon: Download, key: 'export', color: 'from-amber-500 to-orange-600' },
     { icon: GripVertical, key: 'drag_drop', color: 'from-pink-500 to-rose-600' },
     { icon: Target, key: 'ats', color: 'from-cyan-500 to-brand-600' },
+    { icon: BarChart2, key: 'ats_score', color: 'from-indigo-500 to-blue-600' },
+    { icon: Lightbulb, key: 'role_based', color: 'from-amber-500 to-yellow-600' },
   ];
 
   return (
@@ -35,7 +35,7 @@ export default function Features() {
           </p>
         </div>
 
-        <div ref={gridRef} className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <div ref={gridRef} className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {features.map(({ icon: Icon, key, color }, index) => (
             <div
               key={key}
