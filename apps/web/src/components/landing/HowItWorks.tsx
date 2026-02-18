@@ -38,13 +38,13 @@ const steps = [
 
 export default function HowItWorks() {
   const t = useTranslations('how_it_works');
-  const { ref: sectionRef, isInView } = useInView({ threshold: 0.1 });
+  const { ref: sectionRef, isInView } = useInView({ threshold: 0.05 });
 
   return (
     <section className="py-20 sm:py-28 bg-stone-50 dark:bg-stone-900/50">
       <div
         ref={sectionRef}
-        className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 transition-all duration-700 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
       >
         {/* Heading */}
         <div className="mx-auto max-w-2xl text-center">
@@ -69,8 +69,8 @@ export default function HowItWorks() {
             {steps.map(({ number, icon: Icon, titleKey, descKey, color, bg, border }, index) => (
               <div
                 key={number}
-                className={`relative flex flex-col items-center text-center transition-all duration-500 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
-                style={{ transitionDelay: isInView ? `${index * 150}ms` : '0ms' }}
+                className={`relative flex flex-col items-center text-center transition-all duration-500 ${isInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+                style={{ transitionDelay: `${index * 150}ms` }}
               >
                 {/* Icon circle */}
                 <div className="relative z-10 mb-6">

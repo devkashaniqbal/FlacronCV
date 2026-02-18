@@ -27,9 +27,9 @@ export default function Hero() {
           className={`mx-auto max-w-3xl text-center transition-all duration-700 ${contentInView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
         >
           {/* Badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-1.5 text-sm font-medium text-brand-700 dark:border-brand-800 dark:bg-brand-950/50 dark:text-brand-300">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm dark:border-brand-800 dark:bg-brand-950/50 dark:text-brand-300">
             <Sparkles className="h-4 w-4" />
-            Powered by IBM &amp; Microsoft
+            <span>AI Powered by <strong>IBM</strong> &amp; <strong>Microsoft</strong></span>
           </div>
 
           {/* Headline */}
