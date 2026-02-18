@@ -16,7 +16,7 @@ export default function Hero() {
       {/* Background gradient */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-brand-50/50 via-white to-white dark:from-brand-950/20 dark:via-stone-950 dark:to-stone-950" />
-        <div className="absolute left-1/2 top-0 -z-10 -transtone-x-1/2">
+        <div className="absolute left-1/2 top-0 -z-10 -translate-x-1/2">
           <div className="h-[600px] w-[600px] rounded-full bg-brand-400/10 blur-3xl dark:bg-brand-600/5" />
         </div>
       </div>
@@ -49,21 +49,34 @@ export default function Hero() {
           </h1>
 
           {/* Subtitle */}
-          <p className="mb-10 text-lg text-stone-600 sm:text-xl dark:text-stone-400">
+          <p className="mb-6 text-lg text-stone-600 sm:text-xl dark:text-stone-400">
             {t('hero.subtitle')}
           </p>
 
+          {/* Proof point */}
+          <div className="mb-10 inline-flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-stone-200 bg-white/80 px-5 py-3 shadow-sm backdrop-blur-sm dark:border-stone-700 dark:bg-stone-800/60">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-stone-700 dark:text-stone-300">
+              <span className="text-brand-600">✓</span> ATS-friendly templates
+            </span>
+            <span className="hidden h-4 w-px bg-stone-300 dark:bg-stone-600 sm:block" />
+            <span className="flex items-center gap-1.5 text-sm font-medium text-stone-700 dark:text-stone-300">
+              <span className="text-brand-600">✓</span> Export to PDF &amp; DOCX
+            </span>
+            <span className="hidden h-4 w-px bg-stone-300 dark:bg-stone-600 sm:block" />
+            <span className="flex items-center gap-1.5 text-sm font-medium text-stone-700 dark:text-stone-300">
+              <span className="text-brand-600">✓</span> Ready in minutes
+            </span>
+          </div>
+
           {/* CTAs */}
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/register">
               <Button variant="gradient" size="lg" icon={<ArrowRight className="h-5 w-5" />}>
                 {t('hero.cta_primary')}
               </Button>
             </Link>
-            <a href="#features">
-              <Button variant="secondary" size="lg">
-                {t('hero.cta_secondary')}
-              </Button>
+            <a href="#features" className="text-sm font-medium text-stone-500 underline-offset-4 hover:text-stone-700 hover:underline dark:text-stone-400 dark:hover:text-stone-200 transition-colors">
+              {t('hero.cta_secondary')} →
             </a>
           </div>
 
