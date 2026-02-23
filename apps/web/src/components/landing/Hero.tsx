@@ -273,20 +273,13 @@ export default function Hero() {
             <span>AI Powered by <strong>IBM</strong> &amp; <strong>Microsoft</strong></span>
           </div>
 
-          {/* Headline — splits on "AI" to gradient-highlight it */}
+          {/* Headline */}
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-stone-900 sm:text-5xl lg:text-6xl dark:text-white">
-            {t('hero.title').split('AI').map((part, i, arr) =>
-              i < arr.length - 1 ? (
-                <span key={i}>
-                  {part}
-                  <span className="bg-gradient-to-r from-brand-500 to-violet-600 bg-clip-text text-transparent">
-                    AI
-                  </span>
-                </span>
-              ) : (
-                <span key={i}>{part}</span>
-              ),
-            )}
+            Your{' '}
+            <span className="bg-gradient-to-r from-brand-500 to-violet-600 bg-clip-text text-transparent">
+              Dream Job
+            </span>{' '}
+            Starts Here
           </h1>
 
           {/* Subtitle */}
