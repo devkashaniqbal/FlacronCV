@@ -45,11 +45,8 @@ export default function Navbar() {
     <nav className="fixed top-0 z-50 w-full border-b border-stone-200/80 bg-white/80 backdrop-blur-lg dark:border-stone-700/80 dark:bg-black/80">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center">
           <Image src="/logo.png" alt="FlacronCV" width={36} height={36} className="rounded-lg" />
-          <span className="text-xl font-bold text-stone-900 dark:text-white">
-            Flacron<span className="text-brand-600">CV</span>
-          </span>
         </Link>
 
         {/* Desktop nav */}

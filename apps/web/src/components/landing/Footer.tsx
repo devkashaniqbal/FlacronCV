@@ -26,11 +26,8 @@ export default function Footer() {
         <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center">
               <Image src="/logo.png" alt="FlacronCV" width={32} height={32} className="rounded-lg" />
-              <span className="text-lg font-bold text-stone-900 dark:text-white">
-                Flacron<span className="text-brand-600">CV</span>
-              </span>
             </Link>
             <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
               {t('footer.description')}
