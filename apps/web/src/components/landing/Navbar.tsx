@@ -46,7 +46,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center">
-          <Image src="/logo.png" alt="FlacronCV" width={52} height={52} className="rounded-xl" />
+          <Image src="/logo.png" alt="FlacronCV" width={120} height={120} className="h-10 w-auto" />
         </Link>
 
         {/* Desktop nav */}

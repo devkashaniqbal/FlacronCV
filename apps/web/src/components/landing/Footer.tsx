@@ -27,7 +27,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center">
-              <Image src="/logo.png" alt="FlacronCV" width={48} height={48} className="rounded-xl" />
+              <Image src="/logo.png" alt="FlacronCV" width={120} height={120} className="h-10 w-auto" />
             </Link>
             <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">
               {t('footer.description')}
