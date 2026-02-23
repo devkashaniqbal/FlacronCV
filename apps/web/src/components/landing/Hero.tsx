@@ -4,7 +4,6 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import Button from '@/components/ui/Button';
 import {
-  ArrowRight,
   Sparkles,
   CheckCircle2,
   Undo2,
@@ -298,7 +297,7 @@ export default function Hero() {
           {/* CTAs */}
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/register">
-              <Button variant="gradient" size="lg" icon={<ArrowRight className="h-5 w-5" />}>
+              <Button variant="gradient" size="lg">
                 {t('hero.cta_primary')}
               </Button>
             </Link>
