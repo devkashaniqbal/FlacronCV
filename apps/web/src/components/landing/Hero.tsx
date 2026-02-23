@@ -302,16 +302,13 @@ export default function Hero() {
                 {t('hero.cta_primary')}
               </Button>
             </Link>
-            <a
-              href="#how-it-works"
-              onClick={(e) => {
-                e.preventDefault();
-                document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="text-sm font-medium text-stone-500 underline-offset-4 transition-colors hover:text-stone-700 hover:underline dark:text-stone-400 dark:hover:text-stone-200"
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}
             >
               {t('hero.cta_secondary')} →
-            </a>
+            </Button>
           </div>
 
           {/* Trust bar */}
