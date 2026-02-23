@@ -2,7 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link, usePathname } from '@/i18n/routing';
-import { FileText } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Footer() {
   const t = useTranslations();
@@ -27,9 +27,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-white">
-                <FileText className="h-4 w-4" />
-              </div>
+              <Image src="/logo.png" alt="FlacronCV" width={32} height={32} className="rounded-lg" />
               <span className="text-lg font-bold text-stone-900 dark:text-white">
                 Flacron<span className="text-brand-600">CV</span>
               </span>

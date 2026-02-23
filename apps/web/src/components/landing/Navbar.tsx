@@ -5,7 +5,8 @@ import { useTranslations } from 'next-intl';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
 import { useAuth } from '@/providers/AuthProvider';
 import { useTheme } from '@/providers/ThemeProvider';
-import { Menu, X, FileText, Sun, Moon } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 
@@ -45,9 +46,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white">
-            <FileText className="h-5 w-5" />
-          </div>
+          <Image src="/logo.png" alt="FlacronCV" width={36} height={36} className="rounded-lg" />
           <span className="text-xl font-bold text-stone-900 dark:text-white">
             Flacron<span className="text-brand-600">CV</span>
           </span>
