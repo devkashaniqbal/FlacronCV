@@ -53,7 +53,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} dir={dir} suppressHydrationWarning>
-      <body className={`${inter.variable} ${merriweather.variable} ${playfair.variable} ${roboto.variable} ${lora.variable} ${openSans.variable} ${montserrat.variable} font-sans antialiased`}>
+      <body suppressHydrationWarning className={`${inter.variable} ${merriweather.variable} ${playfair.variable} ${roboto.variable} ${lora.variable} ${openSans.variable} ${montserrat.variable} font-sans antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <QueryProvider>
             <ThemeProvider>

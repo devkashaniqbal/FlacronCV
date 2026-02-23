@@ -13,6 +13,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@flacroncv/shared-types": "workspace:*",
+    "@getbrevo/brevo": "^4.0.1",
     "@nestjs/common": "^10.3.0",
     "@nestjs/config": "^3.1.0",
     "@nestjs/core": "^10.3.0",
@@ -31,8 +33,7 @@
     "rxjs": "^7.8.1",
     "stripe": "^14.14.0",
     "uuid": "^9.0.0",
-    "winston": "^3.11.0",
-    "@flacroncv/shared-types": "workspace:*"
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.0",

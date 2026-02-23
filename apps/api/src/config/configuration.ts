@@ -30,4 +30,15 @@ export default () => ({
       enterpriseYearly: process.env.STRIPE_ENTERPRISE_YEARLY_PRICE_ID,
     },
   },
+
+  brevo: {
+    apiKey: process.env.BREVO_API_KEY,
+    fromEmail: process.env.BREVO_FROM_EMAIL || 'noreply@flacroncv.com',
+    fromName: process.env.BREVO_FROM_NAME || 'FlacronCV',
+    templates: {
+      welcome: parseInt(process.env.BREVO_TEMPLATE_WELCOME || '0', 10),
+      verification: parseInt(process.env.BREVO_TEMPLATE_VERIFICATION || '0', 10),
+      passwordReset: parseInt(process.env.BREVO_TEMPLATE_PASSWORD_RESET || '0', 10),
+    },
+  },
 });

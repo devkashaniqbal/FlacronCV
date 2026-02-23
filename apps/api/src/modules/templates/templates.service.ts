@@ -17,8 +17,9 @@ export class TemplatesService {
     if (category) query = query.where('category', '==', category);
     if (tier) query = query.where('tier', '==', tier);
 
-    const snapshot = await query.orderBy('usageCount', 'desc').get();
-    return snapshot.docs.map((doc) => doc.data() as Template);
+    const snapshot = await query.get();
+    const templates = snapshot.docs.map((doc) => doc.data() as Template);
+    return templates.sort((a, b) => (b.usageCount ?? 0) - (a.usageCount ?? 0));
   }
 
   async findById(id: string): Promise<Template> {

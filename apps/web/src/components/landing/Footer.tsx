@@ -1,11 +1,24 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { Link } from '@/i18n/routing';
+import { Link, usePathname } from '@/i18n/routing';
 import { FileText } from 'lucide-react';
 
 export default function Footer() {
   const t = useTranslations();
+  const pathname = usePathname();
+
+  const handleSectionLink = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    sectionId: string,
+  ) => {
+    if (pathname === '/') {
+      e.preventDefault();
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const linkClass = 'text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400 dark:hover:text-brand-400 transition-colors';
 
   return (
     <footer className="border-t border-stone-200 bg-stone-50 dark:border-stone-800 dark:bg-stone-900">
@@ -32,9 +45,34 @@ export default function Footer() {
               {t('footer.product')}
             </h4>
             <ul className="mt-3 space-y-2">
-              <li><a href="#features" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('nav.features')}</a></li>
-              <li><a href="#pricing" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('nav.pricing')}</a></li>
-              <li><Link href="/register" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('dashboard.templates')}</Link></li>
+              <li>
+                <a
+                  href="/#features"
+                  onClick={(e) => handleSectionLink(e, 'features')}
+                  className={linkClass}
+                >
+                  {t('nav.features')}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/#pricing"
+                  onClick={(e) => handleSectionLink(e, 'pricing')}
+                  className={linkClass}
+                >
+                  {t('nav.pricing')}
+                </a>
+              </li>
+              <li>
+                <Link href="/templates" className={linkClass}>
+                  {t('nav.templates')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/testimonials" className={linkClass}>
+                  {t('footer.testimonials')}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -44,9 +82,26 @@ export default function Footer() {
               {t('footer.company')}
             </h4>
             <ul className="mt-3 space-y-2">
-              <li><a href="#" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('footer.about')}</a></li>
-              <li><a href="#" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('footer.blog')}</a></li>
-              <li><a href="#" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('footer.contact')}</a></li>
+              <li>
+                <Link href="/about-us" className={linkClass}>
+                  {t('footer.about')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact-us" className={linkClass}>
+                  {t('footer.contact')}
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="https://flacronenterprises.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={linkClass}
+                >
+                  {t('footer.parent_company')}
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -56,9 +111,21 @@ export default function Footer() {
               {t('footer.legal')}
             </h4>
             <ul className="mt-3 space-y-2">
-              <li><a href="#" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('footer.privacy')}</a></li>
-              <li><a href="#" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('footer.terms')}</a></li>
-              <li><a href="#" className="text-sm text-stone-500 hover:text-brand-600 dark:text-stone-400">{t('footer.cookies')}</a></li>
+              <li>
+                <Link href="/privacy-policy" className={linkClass}>
+                  {t('footer.privacy')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms-of-service" className={linkClass}>
+                  {t('footer.terms')}
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookie-policy" className={linkClass}>
+                  {t('footer.cookies')}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

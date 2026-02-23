@@ -20,8 +20,25 @@ export class AuthController {
       user.uid,
       user.email,
       (user as Record<string, unknown>).name as string || user.email,
+      (user.emailVerified as boolean) || false,
       (user as Record<string, unknown>).picture as string,
     );
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  async resetPassword(@Body() body: { email: string }) {
+    await this.authService.sendPasswordReset(body.email);
+    return { message: 'Password reset email sent' };
+  }
+
+  @Post('send-verification')
+  @UseGuards(FirebaseAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  async sendVerification(@CurrentUser() user: FirebaseUser) {
+    await this.authService.sendEmailVerification(user.uid);
+    return { message: 'Verification email sent' };
   }
 
   @Post('set-claims')

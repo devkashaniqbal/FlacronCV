@@ -90,6 +90,25 @@ export class CVService {
     };
   }
 
+  private async checkTemplateAccess(templateId: string, userId: string): Promise<void> {
+    if (!templateId || templateId === 'modern') return; // 'modern' is always free
+    const templateDoc = await this.firebaseAdmin.firestore
+      .collection('templates')
+      .doc(templateId)
+      .get();
+    if (!templateDoc.exists) return; // if template not found, allow (don't block creation)
+    const template = templateDoc.data() as { tier: string };
+    if (template.tier === 'free') return;
+
+    const user = await this.usersService.findByIdOrThrow(userId);
+    const limits = PLAN_CONFIGS[user.subscription.plan].limits;
+    if (limits.templates === 'free_only') {
+      throw new ForbiddenException(
+        `Template "${templateId}" requires a Pro or higher plan. Please upgrade.`,
+      );
+    }
+  }
+
   async create(userId: string, data: CreateCVData): Promise<CV> {
     const user = await this.usersService.findByIdOrThrow(userId);
     const limits = PLAN_CONFIGS[user.subscription.plan].limits;
@@ -102,6 +121,8 @@ export class CVService {
     const now = new Date();
     const slug = `${data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${id.slice(0, 8)}`;
     const templateId = data.templateId || 'modern';
+
+    await this.checkTemplateAccess(templateId, userId);
     const styling = this.getTemplateStyling(templateId);
     const sample = this.getSampleContent(user);
 
@@ -214,6 +235,9 @@ export class CVService {
 
   async update(id: string, userId: string, data: UpdateCVData): Promise<CV> {
     await this.findByIdOrThrow(id, userId);
+    if (data.templateId) {
+      await this.checkTemplateAccess(data.templateId, userId);
+    }
 
     const updateData: Record<string, unknown> = { updatedAt: new Date() };
 
@@ -248,6 +272,12 @@ export class CVService {
   }
 
   async duplicate(id: string, userId: string): Promise<CV> {
+    const user = await this.usersService.findByIdOrThrow(userId);
+    const limits = PLAN_CONFIGS[user.subscription.plan].limits;
+    if (limits.cvs !== 'unlimited' && user.usage.cvsCreated >= limits.cvs) {
+      throw new ForbiddenException('CV limit reached for your plan. Please upgrade.');
+    }
+
     const original = await this.findByIdOrThrow(id, userId);
     const sections = await this.getSections(id);
 
@@ -267,6 +297,7 @@ export class CVService {
     };
 
     await this.firebaseAdmin.firestore.collection(this.collection).doc(newId).set(newCV);
+    await this.usersService.incrementUsage(userId, 'cvsCreated');
 
     for (const section of sections) {
       const newSectionId = uuidv4();

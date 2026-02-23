@@ -34,6 +34,7 @@ const config: Config = {
         'shimmer': 'shimmer 1.5s infinite',
         'scale-in': 'scaleIn 0.2s ease-out',
         'bounce-subtle': 'bounceSubtle 2s infinite',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         fadeIn: {

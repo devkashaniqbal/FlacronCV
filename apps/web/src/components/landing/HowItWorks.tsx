@@ -41,7 +41,7 @@ export default function HowItWorks() {
   const { ref: sectionRef, isInView } = useInView({ threshold: 0.05 });
 
   return (
-    <section className="py-20 sm:py-28 bg-stone-50 dark:bg-stone-900/50">
+    <section id="how-it-works" className="py-20 sm:py-28 bg-stone-50 dark:bg-stone-900/50">
       <div
         ref={sectionRef}
         className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"

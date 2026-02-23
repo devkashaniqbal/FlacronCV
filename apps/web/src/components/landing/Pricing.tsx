@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { Check, ShieldCheck, Lock, Trash2 } from 'lucide-react';
+import { Check, ShieldCheck, Lock, Trash2, Zap } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { PLAN_CONFIGS, SubscriptionPlan } from '@flacroncv/shared-types';
@@ -19,17 +19,23 @@ export default function Pricing() {
     {
       key: SubscriptionPlan.FREE,
       featured: false,
-      bestFor: 'Students & job seekers starting out',
+      bestFor: 'Students & first-time job seekers',
+      cta: t('pricing.get_started'),
+      ctaHref: '/register',
     },
     {
       key: SubscriptionPlan.PRO,
       featured: true,
       bestFor: 'Active job seekers & career switchers',
+      cta: t('pricing.upgrade'),
+      ctaHref: '/register',
     },
     {
       key: SubscriptionPlan.ENTERPRISE,
       featured: false,
       bestFor: 'Teams, recruiters & career coaches',
+      cta: 'Contact Sales',
+      ctaHref: '/contact-us',
     },
   ];
 
@@ -48,48 +54,53 @@ export default function Pricing() {
           </p>
 
           {/* Toggle */}
-          <div className="mt-8 inline-flex items-center gap-3 rounded-full border border-stone-200 bg-white p-1 dark:border-stone-700 dark:bg-stone-800">
+          <div className="mt-8 inline-flex items-center gap-1 rounded-full border border-stone-200 bg-white p-1 dark:border-stone-700 dark:bg-stone-800">
             <button
               className={cn(
-                'rounded-full px-4 py-2 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-stone-800',
+                'rounded-full px-5 py-2 text-sm font-medium transition-all focus:outline-none',
                 !yearly
                   ? 'bg-brand-600 text-white shadow-sm'
-                  : 'text-stone-700 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white',
+                  : 'text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white',
               )}
               onClick={() => setYearly(false)}
             >
-              {t('pricing.monthly')}
+              Monthly
             </button>
             <button
               className={cn(
-                'rounded-full px-4 py-2 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-stone-800',
+                'flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium transition-all focus:outline-none',
                 yearly
                   ? 'bg-brand-600 text-white shadow-sm'
-                  : 'text-stone-700 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white',
+                  : 'text-stone-600 hover:text-stone-900 dark:text-stone-300 dark:hover:text-white',
               )}
               onClick={() => setYearly(true)}
             >
-              {t('pricing.yearly')}
-              {yearly && (
-                <span className="ms-1.5 text-xs text-emerald-500 font-semibold">{t('pricing.save')}</span>
-              )}
+              Yearly
+              <span className={cn(
+                'rounded-full px-2 py-0.5 text-[11px] font-bold transition-colors',
+                yearly
+                  ? 'bg-white/20 text-white'
+                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-400',
+              )}>
+                Save 33%
+              </span>
             </button>
           </div>
         </div>
 
         {/* Trust strip */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-stone-500 dark:text-stone-400">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-stone-500 dark:text-stone-400">
+          <div className="flex items-center gap-2">
+            <Lock className="h-4 w-4 text-emerald-500" />
+            Payments secured by Stripe
+          </div>
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
             We never sell your data
           </div>
           <div className="flex items-center gap-2">
             <Trash2 className="h-4 w-4 text-emerald-500" />
-            Delete your account anytime
-          </div>
-          <div className="flex items-center gap-2">
-            <Lock className="h-4 w-4 text-emerald-500" />
-            Payments secured by Stripe
+            Cancel or delete anytime
           </div>
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
@@ -97,53 +108,90 @@ export default function Pricing() {
           </div>
         </div>
 
-        <div className="mt-12 grid gap-8 lg:grid-cols-3">
-          {plans.map(({ key, featured, bestFor }) => {
+        <div className="mt-10 grid gap-8 lg:grid-cols-3">
+          {plans.map(({ key, featured, bestFor, cta, ctaHref }) => {
             const config = PLAN_CONFIGS[key];
-            const price = yearly ? config.priceYearly : config.priceMonthly;
-            const interval = yearly ? t('pricing.per_year') : t('pricing.per_month');
+            const monthlyPrice = config.priceMonthly;
+            const perMonth = yearly ? config.priceYearly / 12 : monthlyPrice;
+            const annualTotal = config.priceYearly;
+            const monthlyCost12 = monthlyPrice * 12;
+            const savingsAmount = monthlyCost12 - annualTotal;
+            const savingsPct = monthlyCost12 > 0 ? Math.round((savingsAmount / monthlyCost12) * 100) : 0;
+            const isFree = monthlyPrice === 0;
 
             return (
               <div
                 key={key}
                 className={cn(
-                  'relative rounded-2xl border p-5 sm:p-8 transition-shadow',
+                  'relative flex flex-col rounded-2xl border p-6 sm:p-8 transition-shadow hover:shadow-lg',
                   featured
                     ? 'border-brand-500 bg-white shadow-xl ring-1 ring-brand-500 dark:border-brand-400 dark:bg-stone-800 dark:ring-brand-400'
                     : 'border-stone-200 bg-white dark:border-stone-700 dark:bg-stone-800',
                 )}
               >
                 {featured && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                     <Badge variant="brand" size="md">
                       {t('pricing.popular')}
                     </Badge>
                   </div>
                 )}
 
+                {/* Plan header */}
                 <div className="mb-6">
-                  <h3 className="text-xl font-bold text-stone-900 dark:text-white">
-                    {config.name}
-                  </h3>
-                  <p className="mt-1 text-xs text-stone-600 dark:text-stone-400">
-                    Best for: {bestFor}
-                  </p>
-                  <div className="mt-4 flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-stone-900 dark:text-white">
-                      ${price === 0 ? '0' : price.toFixed(2)}
-                    </span>
-                    {price > 0 && (
-                      <span className="text-sm text-stone-500">{interval}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-xl font-bold text-stone-900 dark:text-white">
+                      {config.name}
+                    </h3>
+                    {featured && (
+                      <Zap className="h-4 w-4 text-brand-500" />
                     )}
                   </div>
-                  {yearly && price > 0 && (
-                    <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
-                      {t('pricing.billed_annually')}
-                    </p>
-                  )}
+                  <p className="text-xs text-stone-500 dark:text-stone-400">
+                    {bestFor}
+                  </p>
+
+                  {/* Price display */}
+                  <div className="mt-5">
+                    {isFree ? (
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl font-extrabold text-stone-900 dark:text-white">$0</span>
+                        <span className="text-sm text-stone-500 dark:text-stone-400">/month</span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-4xl font-extrabold text-stone-900 dark:text-white">
+                            ${perMonth.toFixed(2)}
+                          </span>
+                          <span className="text-sm text-stone-500 dark:text-stone-400">/mo</span>
+                        </div>
+                        {yearly ? (
+                          <div className="mt-1.5 space-y-0.5">
+                            <p className="text-sm text-stone-500 dark:text-stone-400">
+                              Billed as{' '}
+                              <span className="font-semibold text-stone-700 dark:text-stone-300">
+                                ${annualTotal.toFixed(2)}/year
+                              </span>
+                            </p>
+                            {savingsPct > 0 && (
+                              <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                Save ${savingsAmount.toFixed(2)} compared to monthly
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="mt-1 text-xs text-stone-400 dark:text-stone-500">
+                            Switch to yearly and save {savingsPct > 0 ? `${savingsPct}%` : 'more'}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <ul className="mb-8 space-y-3">
+                {/* Features */}
+                <ul className="mb-8 flex-1 space-y-3">
                   {config.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3 text-sm">
                       <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" />
@@ -152,19 +200,24 @@ export default function Pricing() {
                   ))}
                 </ul>
 
-                <Link href={key === SubscriptionPlan.FREE ? '/register' : '/register'}>
+                <Link href={ctaHref}>
                   <Button
-                    variant={featured ? 'primary' : 'outline'}
+                    variant={featured ? 'primary' : key === SubscriptionPlan.ENTERPRISE ? 'outline' : 'outline'}
                     className="w-full"
                     size="lg"
                   >
-                    {key === SubscriptionPlan.FREE ? t('pricing.get_started') : t('pricing.upgrade')}
+                    {cta}
                   </Button>
                 </Link>
               </div>
             );
           })}
         </div>
+
+        {/* Bottom note */}
+        <p className="mt-8 text-center text-sm text-stone-500 dark:text-stone-400">
+          All plans include a <strong className="text-stone-700 dark:text-stone-300">14-day free trial</strong> on paid tiers. No credit card required for Free plan.
+        </p>
       </div>
     </section>
   );

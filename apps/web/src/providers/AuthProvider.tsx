@@ -8,8 +8,6 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  sendPasswordResetEmail,
-  sendEmailVerification,
   updateProfile,
 } from 'firebase/auth';
 import { auth, googleProvider, githubProvider, isConfigured } from '@/lib/firebase';
@@ -20,12 +18,14 @@ interface AuthContextType {
   firebaseUser: FirebaseUser | null;
   user: User | null;
   loading: boolean;
+  emailVerified: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   loginWithGithub: () => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  resendVerification: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -86,8 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth) throw new Error('Firebase not configured');
     const result = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(result.user, { displayName: name });
-    // Send email verification
-    await sendEmailVerification(result.user);
+    // Verification email is sent automatically by the backend on first verifyAndSync call
   };
 
   const loginWithGoogle = async () => {
@@ -107,8 +106,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const resetPassword = async (email: string) => {
-    if (!auth) throw new Error('Firebase not configured');
-    await sendPasswordResetEmail(auth, email);
+    await api.post('/auth/reset-password', { email });
+  };
+
+  const resendVerification = async () => {
+    await api.post('/auth/send-verification');
   };
 
   return (
@@ -117,12 +119,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         firebaseUser,
         user,
         loading,
+        emailVerified: firebaseUser?.emailVerified ?? true, // true for Google/GitHub (always verified)
         login,
         register,
         loginWithGoogle,
         loginWithGithub,
         logout,
         resetPassword,
+        resendVerification,
       }}
     >
       {children}

@@ -1,8 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, ForbiddenException } from '@nestjs/common';
 import { FirebaseAdminService } from '../firebase/firebase-admin.service';
 import { CVService } from '../cv/cv.service';
 import { CoverLetterService } from '../cover-letter/cover-letter.service';
 import { UsersService } from '../users/users.service';
+import { PLAN_CONFIGS } from '@flacroncv/shared-types';
 import * as Handlebars from 'handlebars';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -20,6 +21,16 @@ export class ExportService {
     private usersService: UsersService,
   ) {
     this.loadTemplates();
+  }
+
+  private async checkExportLimit(userId: string): Promise<void> {
+    const user = await this.usersService.findByIdOrThrow(userId);
+    const limits = PLAN_CONFIGS[user.subscription.plan].limits;
+    if (limits.exports !== 'unlimited' && user.usage.exportsThisMonth >= limits.exports) {
+      throw new ForbiddenException(
+        `Export limit reached for your plan (${limits.exports}/month). Please upgrade.`,
+      );
+    }
   }
 
   private loadTemplates() {
@@ -42,6 +53,7 @@ export class ExportService {
   }
 
   async exportCVToPDF(cvId: string, userId: string): Promise<{ downloadUrl: string; expiresAt: Date }> {
+    await this.checkExportLimit(userId);
     const cv = await this.cvService.findByIdOrThrow(cvId, userId);
     const sections = await this.cvService.getSections(cvId);
 
@@ -86,6 +98,7 @@ export class ExportService {
   }
 
   async exportCVToDocx(cvId: string, userId: string): Promise<{ downloadUrl: string; expiresAt: Date }> {
+    await this.checkExportLimit(userId);
     const cv = await this.cvService.findByIdOrThrow(cvId, userId);
     const sections = await this.cvService.getSections(cvId);
 
@@ -263,6 +276,7 @@ export class ExportService {
   }
 
   async exportCoverLetterToPDF(coverLetterId: string, userId: string): Promise<{ downloadUrl: string; expiresAt: Date }> {
+    await this.checkExportLimit(userId);
     const coverLetter = await this.coverLetterService.findByIdOrThrow(coverLetterId, userId);
 
     // Build HTML from cover letter
@@ -306,6 +320,7 @@ export class ExportService {
   }
 
   async exportCoverLetterToDocx(coverLetterId: string, userId: string): Promise<{ downloadUrl: string; expiresAt: Date }> {
+    await this.checkExportLimit(userId);
     const coverLetter = await this.coverLetterService.findByIdOrThrow(coverLetterId, userId);
 
     const { Document, Packer, Paragraph, TextRun, AlignmentType } = await import('docx');

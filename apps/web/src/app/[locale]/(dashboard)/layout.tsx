@@ -8,17 +8,22 @@ import { Loader2 } from 'lucide-react';
 import { useRouter } from '@/i18n/routing';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, emailVerified } = useAuth();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (loading) return;
+    if (!user) {
       router.push('/login');
+      return;
     }
-  }, [loading, user, router]);
+    if (!emailVerified) {
+      router.push('/verify-email');
+    }
+  }, [loading, user, emailVerified, router]);
 
-  if (loading || !user) {
+  if (loading || !user || !emailVerified) {
     return (
       <div className="flex h-screen items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-brand-600" />

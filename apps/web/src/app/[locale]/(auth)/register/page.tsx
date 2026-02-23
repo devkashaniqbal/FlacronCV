@@ -8,6 +8,25 @@ import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { toast } from 'sonner';
 
+const PENDING_TEMPLATE_KEY = 'flacroncv_pending_template';
+
+function getPostLoginRedirect(): string {
+  try {
+    const raw = localStorage.getItem(PENDING_TEMPLATE_KEY);
+    if (raw) {
+      const { templateId, category } = JSON.parse(raw) as { templateId: string; category: string };
+      localStorage.removeItem(PENDING_TEMPLATE_KEY);
+      if (category === 'cover_letter') {
+        return `/cover-letters/new?template=${templateId}`;
+      }
+      return `/cv/new?template=${templateId}`;
+    }
+  } catch {
+    // ignore
+  }
+  return '/dashboard';
+}
+
 export default function RegisterPage() {
   const t = useTranslations('auth');
   const { register, loginWithGoogle, loginWithGithub } = useAuth();
@@ -26,8 +45,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(email, password, name);
-      toast.success('Verification email sent! Please check your inbox.');
-      router.push('/dashboard');
+      router.push('/verify-email');
     } catch (error) {
       toast.error((error as Error).message || 'Registration failed');
     } finally {
@@ -38,7 +56,7 @@ export default function RegisterPage() {
   const handleGoogle = async () => {
     try {
       await loginWithGoogle();
-      router.push('/dashboard');
+      router.push(getPostLoginRedirect());
     } catch (error) {
       toast.error('Google sign-in failed');
     }
@@ -47,7 +65,7 @@ export default function RegisterPage() {
   const handleGithub = async () => {
     try {
       await loginWithGithub();
-      router.push('/dashboard');
+      router.push(getPostLoginRedirect());
     } catch (error) {
       toast.error('GitHub sign-in failed');
     }
