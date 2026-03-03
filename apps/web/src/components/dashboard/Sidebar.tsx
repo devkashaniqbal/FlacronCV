@@ -11,7 +11,6 @@ import {
   Settings,
   HelpCircle,
   CreditCard,
-  Shield,
   X,
   FileText as Logo,
 } from 'lucide-react';
@@ -93,13 +92,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             <NavLink key={item.href} {...item} />
           ))}
 
-          {/* Admin link */}
-          {(user?.role === 'admin' || user?.role === 'super_admin') && (
-            <>
-              <div className="my-3 border-t border-stone-200 dark:border-stone-700" />
-              <NavLink href="/admin" icon={Shield} label="Admin" />
-            </>
-          )}
         </nav>
 
         {/* Bottom nav */}

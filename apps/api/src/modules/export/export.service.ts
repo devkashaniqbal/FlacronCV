@@ -230,8 +230,9 @@ export class ExportService {
   .item-subtitle { color: #555; font-size: 14px; }
   .item-date { color: #888; font-size: 13px; }
   .item-desc { font-size: 14px; margin-top: 4px; }
-  .skills-list { display: flex; flex-wrap: wrap; gap: 8px; }
-  .skill-tag { background: ${cv.styling.primaryColor}15; color: ${cv.styling.primaryColor}; padding: 4px 12px; border-radius: 4px; font-size: 13px; }
+  .skills-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .skill-tag { background: ${cv.styling.primaryColor}15; color: ${cv.styling.primaryColor}; padding: 4px 12px; border-radius: 4px; font-size: 13px; white-space: nowrap; }
+  .skill-level { opacity: 0.7; font-size: 11px; }
 </style>
 </head>
 <body>
@@ -243,33 +244,34 @@ export class ExportService {
   ${cv.personalInfo.summary ? `<div class="summary"><h2>Professional Summary</h2><p>${cv.personalInfo.summary}</p></div>` : ''}
   ${sections
     .filter((s: any) => s.isVisible)
-    .map(
-      (section: any) => `
-    <div class="section">
-      <h2>${section.title}</h2>
-      ${section.items
-        .map((item: any) => {
-          if (item.company) {
-            return `<div class="item">
+    .map((section: any) => {
+      let itemsHtml: string;
+      if (section.type === 'skills') {
+        itemsHtml = `<div class="skills-list">${section.items
+          .map((item: any) => `<span class="skill-tag">${item.name}${item.level ? ` <span class="skill-level">${item.level}</span>` : ''}</span>`)
+          .join('')}</div>`;
+      } else {
+        itemsHtml = section.items
+          .map((item: any) => {
+            if (item.company) {
+              return `<div class="item">
               <div class="item-header"><span class="item-title">${item.position}</span><span class="item-date">${item.startDate} - ${item.endDate || 'Present'}</span></div>
               <div class="item-subtitle">${item.company}${item.location ? ` | ${item.location}` : ''}</div>
               ${item.description ? `<div class="item-desc">${item.description}</div>` : ''}
             </div>`;
-          }
-          if (item.institution) {
-            return `<div class="item">
+            }
+            if (item.institution) {
+              return `<div class="item">
               <div class="item-header"><span class="item-title">${item.degree} in ${item.field}</span><span class="item-date">${item.startDate} - ${item.endDate || 'Present'}</span></div>
               <div class="item-subtitle">${item.institution}</div>
             </div>`;
-          }
-          if (item.name && section.type === 'skills') {
-            return `<span class="skill-tag">${item.name}</span>`;
-          }
-          return `<div class="item"><span class="item-title">${item.name || item.title || ''}</span></div>`;
-        })
-        .join('')}
-    </div>`,
-    )
+            }
+            return `<div class="item"><span class="item-title">${item.name || item.title || ''}</span></div>`;
+          })
+          .join('');
+      }
+      return `<div class="section"><h2>${section.title}</h2>${itemsHtml}</div>`;
+    })
     .join('')}
 </body>
 </html>`;

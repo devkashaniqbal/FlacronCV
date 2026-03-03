@@ -3,77 +3,78 @@
 import { useTranslations } from 'next-intl';
 import { Star, BadgeCheck, Quote } from 'lucide-react';
 
-const testimonials = [
+const testimonialMeta = [
   {
+    key: 't1',
     name: 'Lina Petrov',
-    role: 'Senior Finance Analyst',
     company: 'Barclays',
     avatar: 'LP',
     avatarColor: 'bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300',
-    content: 'Got 3 interview calls in 2 weeks after rebuilding my CV with FlacronCV. The ATS checker flagged 8 issues I never would have caught — fixed them all in 20 minutes.',
-    rating: 5,
-    verified: true,
-    result: '3 interviews in 2 weeks',
     resultColor: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
     highlight: true,
+    hasResult: true,
+    rating: 5,
+    verified: true,
   },
   {
+    key: 't2',
     name: 'Sarah Johnson',
-    role: 'Software Engineer',
     company: 'Google',
     avatar: 'SJ',
     avatarColor: 'bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300',
-    content: 'Landed my offer at Google after using FlacronCV to tailor my CV for the role. The AI rewrite suggestions were shockingly accurate — it took 10 minutes start to finish.',
+    resultColor: 'bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-400',
+    highlight: false,
+    hasResult: true,
     rating: 5,
     verified: true,
-    result: 'Landed Google offer',
-    resultColor: 'bg-brand-50 text-brand-700 dark:bg-brand-950/40 dark:text-brand-400',
   },
   {
+    key: 't3',
     name: 'David Kim',
-    role: 'Full Stack Developer',
     company: 'Stripe',
     avatar: 'DK',
     avatarColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300',
-    content: 'My callback rate literally doubled. I was applying for months with zero responses — FlacronCV showed me my ATS score was 38. After the fix, it jumped to 91 and the callbacks started.',
+    resultColor: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
+    highlight: false,
+    hasResult: true,
     rating: 5,
     verified: true,
-    result: '2× callback rate',
-    resultColor: 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400',
   },
   {
+    key: 't4',
     name: 'Ahmed Al-Rashid',
-    role: 'Marketing Director',
     company: 'Publicis Groupe',
     avatar: 'AR',
     avatarColor: 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300',
-    content: 'Needed my CV in both Arabic and English for roles in Dubai and London. FlacronCV handled the translation and RTL formatting perfectly — saved me days of reformatting.',
+    resultColor: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
+    highlight: false,
+    hasResult: true,
     rating: 5,
     verified: true,
-    result: 'Hired across two markets',
-    resultColor: 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400',
   },
   {
+    key: 't5',
     name: 'Maria Garcia',
-    role: 'Product Designer',
     company: 'Meta',
     avatar: 'MG',
     avatarColor: 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300',
-    content: 'I\'ve tried Canva, Resume.io, and Kickresume. FlacronCV is the only one that actually tells you why your CV isn\'t getting through — the ATS scanner is genuinely useful.',
+    resultColor: '',
+    highlight: false,
+    hasResult: false,
     rating: 5,
     verified: true,
   },
   {
+    key: 't6',
     name: 'Fatima Hassan',
-    role: 'Product Manager',
     company: 'Careem',
     avatar: 'FH',
     avatarColor: 'bg-teal-100 text-teal-700 dark:bg-teal-900 dark:text-teal-300',
-    content: 'Created a tailored cover letter for each application in under 5 minutes using the AI generator. Got 2 offers at once and had to choose. Genuinely life-changing tool.',
+    resultColor: 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400',
+    highlight: false,
+    hasResult: true,
     rating: 5,
     verified: true,
-    result: '2 offers simultaneously',
-    resultColor: 'bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400',
   },
 ];
 
@@ -105,9 +106,9 @@ export default function Testimonials() {
         {/* Summary stats */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
           {[
-            { stat: '4.9 / 5', label: 'Average rating' },
-            { stat: '10,000+', label: 'Professionals' },
-            { stat: '2×', label: 'Avg. callback rate increase' },
+            { stat: t('testimonials.stat1_value'), label: t('testimonials.stat1_label') },
+            { stat: t('testimonials.stat2_value'), label: t('testimonials.stat2_label') },
+            { stat: t('testimonials.stat3_value'), label: t('testimonials.stat3_label') },
           ].map(({ stat, label }) => (
             <div key={label} className="text-center">
               <p className="text-2xl font-extrabold text-stone-900 dark:text-white">{stat}</p>
@@ -117,9 +118,9 @@ export default function Testimonials() {
         </div>
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((item) => (
+          {testimonialMeta.map((item) => (
             <div
-              key={item.name}
+              key={item.key}
               className={`relative flex flex-col rounded-2xl border p-6 transition-shadow hover:shadow-md ${
                 item.highlight
                   ? 'border-brand-300 bg-brand-50 dark:border-brand-700 dark:bg-brand-950/30'
@@ -127,17 +128,17 @@ export default function Testimonials() {
               }`}
             >
               {/* Result badge */}
-              {item.result && (
+              {item.hasResult && (
                 <div className={`mb-3 inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${item.resultColor}`}>
                   <span>✓</span>
-                  {item.result}
+                  {t(`testimonials.${item.key}_result`)}
                 </div>
               )}
 
               <Quote className="mb-2 h-5 w-5 text-stone-300 dark:text-stone-600" />
 
               <p className="flex-1 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-                {item.content}
+                {t(`testimonials.${item.key}_content`)}
               </p>
 
               <div className="mt-4 flex items-center justify-between">
@@ -150,7 +151,7 @@ export default function Testimonials() {
                       {item.name}
                     </p>
                     <p className="text-xs text-stone-500 dark:text-stone-400">
-                      {item.role}
+                      {t(`testimonials.${item.key}_role`)}
                       {item.company && (
                         <span className="font-medium text-stone-600 dark:text-stone-300"> · {item.company}</span>
                       )}
@@ -162,7 +163,7 @@ export default function Testimonials() {
                   {item.verified && (
                     <div className="flex items-center gap-1">
                       <BadgeCheck className="h-3.5 w-3.5 text-emerald-500" />
-                      <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">Verified</span>
+                      <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">{t('testimonials.verified')}</span>
                     </div>
                   )}
                 </div>

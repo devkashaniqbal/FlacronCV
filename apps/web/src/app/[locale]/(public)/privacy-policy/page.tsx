@@ -38,7 +38,7 @@ export default async function PrivacyPolicyPage() {
         </Section>
 
         <Section title={t('s2_title')}>
-          <p>We use your information to:</p>
+          <p>{t('s2_use_intro')}</p>
           <ul>
             <li>{t('s2_provide')}</li>
             <li>{t('s2_improve')}</li>

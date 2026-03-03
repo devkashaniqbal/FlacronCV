@@ -98,7 +98,7 @@ function AiGlow() {
 /* ─── Left editor panel ─── */
 function EditorPanel() {
   return (
-    <div className="flex h-full w-[46%] shrink-0 flex-col gap-2.5 overflow-hidden border-e border-stone-200 bg-stone-50 p-3.5 dark:border-stone-700 dark:bg-stone-900/60">
+    <div className="hidden h-full w-[46%] shrink-0 flex-col gap-2.5 overflow-hidden border-e border-stone-200 bg-stone-50 p-3.5 sm:flex dark:border-stone-700 dark:bg-stone-900/60">
       {/* Personal Info */}
       <SectionHeader icon={User} label="Personal Info" color="brand" />
       <div className="grid grid-cols-2 gap-2 rounded-xl border border-stone-200/60 bg-white p-3 shadow-sm dark:border-stone-700/60 dark:bg-stone-800/50">
@@ -270,16 +270,16 @@ export default function Hero() {
           {/* Badge */}
           <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700 shadow-sm dark:border-brand-800 dark:bg-brand-950/50 dark:text-brand-300">
             <Sparkles className="h-4 w-4" />
-            <span>AI Powered by <strong>IBM</strong> &amp; <strong>Microsoft</strong></span>
+            <span>{t('hero.badge')}</span>
           </div>
 
           {/* Headline */}
           <h1 className="mb-6 text-4xl font-extrabold tracking-tight text-stone-900 sm:text-5xl lg:text-6xl dark:text-white">
-            Your{' '}
+            {t('hero.title_part1')}{' '}
             <span className="bg-gradient-to-r from-brand-500 to-violet-600 bg-clip-text text-transparent">
-              Dream Job
+              {t('hero.title_highlight')}
             </span>{' '}
-            Starts Here
+            {t('hero.title_part2')}
           </h1>
 
           {/* Subtitle */}
@@ -307,15 +307,15 @@ export default function Hero() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-stone-500 dark:text-stone-400">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-              Free to start — no card required
+              {t('hero.trust_free')}
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-              ATS-optimized in minutes
+              {t('hero.trust_ats')}
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-              PDF &amp; DOCX export
+              {t('hero.trust_export')}
             </div>
           </div>
         </div>
@@ -376,9 +376,9 @@ export default function Hero() {
                 <div className="h-3 w-3 rounded-full bg-amber-400 hover:bg-amber-500" />
                 <div className="h-3 w-3 rounded-full bg-emerald-400 hover:bg-emerald-500" />
               </div>
-              <div className="flex flex-1 items-center rounded-md border border-stone-200 bg-white px-3 py-1 dark:border-stone-600 dark:bg-stone-700">
-                <div className="h-2 w-2 rounded-full bg-emerald-400 mr-2" />
-                <span className="text-[11px] text-stone-400 dark:text-stone-500">app.flacroncv.com/cv/alex-johnson</span>
+              <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-md border border-stone-200 bg-white px-3 py-1 dark:border-stone-600 dark:bg-stone-700">
+                <div className="mr-2 h-2 w-2 shrink-0 rounded-full bg-emerald-400" />
+                <span className="truncate text-[11px] text-stone-400 dark:text-stone-500">app.flacroncv.com/cv/alex-johnson</span>
               </div>
             </div>
 
@@ -387,36 +387,39 @@ export default function Hero() {
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-600 text-white">
                 <Zap className="h-3.5 w-3.5" />
               </div>
-              <span className="me-3 text-[12px] font-bold text-stone-800 dark:text-white">
+              <span className="me-2 hidden min-w-0 truncate text-[12px] font-bold text-stone-800 sm:inline dark:text-white">
                 Alex Johnson — Senior Engineer <span className="ms-2 rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-semibold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">Saved ✓</span>
               </span>
-              <div className="flex items-center gap-1.5 ms-auto">
-                <ToolbarBtn><Undo2 className="h-3 w-3" /></ToolbarBtn>
-                <ToolbarBtn><Redo2 className="h-3 w-3" /></ToolbarBtn>
-                <div className="mx-1 h-4 w-px bg-stone-200 dark:bg-stone-700" />
+              <div className="ms-auto flex items-center gap-1.5">
+                <div className="hidden sm:flex sm:items-center sm:gap-1.5">
+                  <ToolbarBtn><Undo2 className="h-3 w-3" /></ToolbarBtn>
+                  <ToolbarBtn><Redo2 className="h-3 w-3" /></ToolbarBtn>
+                  <div className="mx-1 h-4 w-px bg-stone-200 dark:bg-stone-700" />
+                </div>
                 <ToolbarBtn active><Sparkles className="h-3 w-3" /> AI Assist</ToolbarBtn>
                 <ToolbarBtn><Download className="h-3 w-3" /> Export</ToolbarBtn>
               </div>
             </div>
 
             {/* Editor body */}
-            <div className="flex" style={{ height: '420px' }}>
+            <div className="flex h-[300px] sm:h-[420px]">
               <EditorPanel />
               <PreviewPanel />
             </div>
 
             {/* Status bar */}
-            <div className="flex items-center justify-between border-t border-stone-200 bg-stone-50 px-4 py-1.5 dark:border-stone-700 dark:bg-stone-800/50">
-              <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between gap-2 border-t border-stone-200 bg-stone-50 px-3 py-1.5 sm:px-4 dark:border-stone-700 dark:bg-stone-800/50">
+              <div className="flex min-w-0 items-center">
                 <AiGlow />
               </div>
-              <div className="flex items-center gap-3 text-[10px] text-stone-400 dark:text-stone-500">
+              <div className="hidden items-center gap-3 text-[10px] text-stone-400 sm:flex dark:text-stone-500">
                 <span>4 sections</span>
                 <span>·</span>
                 <span>342 words</span>
                 <span>·</span>
                 <span className="font-medium text-emerald-500">ATS Ready</span>
               </div>
+              <span className="text-[10px] font-medium text-emerald-500 sm:hidden">ATS Ready</span>
             </div>
           </div>
         </div>

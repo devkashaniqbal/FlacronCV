@@ -37,6 +37,7 @@ export default async function CookiePolicyPage() {
               desc={t('s2_essential_desc')}
               examples={t('s2_essential_examples')}
               required
+              requiredLabel={t('required')}
             />
             <CookieType
               title={t('s2_preference_title')}
@@ -85,11 +86,13 @@ function CookieType({
   desc,
   examples,
   required,
+  requiredLabel,
 }: {
   title: string;
   desc: string;
   examples: string;
   required?: boolean;
+  requiredLabel?: string;
 }) {
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-5 dark:border-stone-800 dark:bg-stone-900">
@@ -97,7 +100,7 @@ function CookieType({
         <h3 className="font-semibold text-stone-900 dark:text-white">{title}</h3>
         {required && (
           <span className="rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-medium text-brand-700 dark:bg-brand-950 dark:text-brand-300">
-            Required
+            {requiredLabel}
           </span>
         )}
       </div>

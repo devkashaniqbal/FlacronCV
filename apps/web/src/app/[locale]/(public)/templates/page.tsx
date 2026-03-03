@@ -510,21 +510,23 @@ export default function PublicTemplatesPage() {
                   </div>
 
                   {/* Card content */}
-                  <div className="space-y-3 p-4">
-                    <div>
-                      <h3 className="font-semibold text-stone-900 dark:text-white">
-                        {template.name}
-                      </h3>
-                      <p className="mt-1 line-clamp-2 text-xs text-stone-500 dark:text-stone-400">
-                        {template.description}
-                      </p>
-                    </div>
+                  <div className="flex flex-col justify-between gap-3 p-4" style={{ minHeight: '120px' }}>
+                    <div className="space-y-2">
+                      <div>
+                        <h3 className="font-semibold text-stone-900 dark:text-white">
+                          {template.name}
+                        </h3>
+                        <p className="mt-1 line-clamp-2 text-xs text-stone-500 dark:text-stone-400">
+                          {template.description}
+                        </p>
+                      </div>
 
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      <Badge variant="default">{categoryLabelMap[template.category]}</Badge>
-                      <Badge variant={tierVariantMap[template.tier]}>
-                        {tierLabelMap[template.tier]}
-                      </Badge>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <Badge variant="default">{categoryLabelMap[template.category]}</Badge>
+                        <Badge variant={tierVariantMap[template.tier]}>
+                          {tierLabelMap[template.tier]}
+                        </Badge>
+                      </div>
                     </div>
 
                     {/* Action button */}

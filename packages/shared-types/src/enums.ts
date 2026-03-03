@@ -114,3 +114,44 @@ export enum BillingInterval {
   MONTH = 'month',
   YEAR = 'year',
 }
+
+export enum CRMCustomerStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  LEAD = 'lead',
+}
+
+export enum CRMLeadStage {
+  NEW = 'new',
+  CONTACTED = 'contacted',
+  QUALIFIED = 'qualified',
+  PROPOSAL = 'proposal',
+  CLOSED_WON = 'closed_won',
+  CLOSED_LOST = 'closed_lost',
+}
+
+export enum CRMTransactionStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed',
+  REFUNDED = 'refunded',
+  FAILED = 'failed',
+}
+
+export enum CRMCustomerSource {
+  MANUAL = 'manual',
+  WEBSITE = 'website',
+  WHATSAPP = 'whatsapp',
+  REFERRAL = 'referral',
+  SOCIAL = 'social',
+  EMAIL = 'email',
+  OTHER = 'other',
+}
+
+export enum CRMActivityType {
+  NOTE = 'note',
+  STATUS_CHANGE = 'status_change',
+  TRANSACTION = 'transaction',
+  LEAD_CONVERTED = 'lead_converted',
+  TAG_ADDED = 'tag_added',
+  TAG_REMOVED = 'tag_removed',
+}

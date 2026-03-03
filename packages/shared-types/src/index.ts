@@ -6,3 +6,4 @@ export * from './template.types';
 export * from './subscription.types';
 export * from './support.types';
 export * from './api.types';
+export * from './crm.types';

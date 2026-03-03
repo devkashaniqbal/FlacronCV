@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { FirebaseAdminService } from '../firebase/firebase-admin.service';
 import { UsersService } from '../users/users.service';
 import { MailService } from '../mail/mail.service';
@@ -12,6 +13,7 @@ export class AuthService {
     private firebaseAdmin: FirebaseAdminService,
     private usersService: UsersService,
     private mailService: MailService,
+    private configService: ConfigService,
   ) {}
 
   async verifyAndSync(uid: string, email: string, displayName: string, emailVerified: boolean, photoURL?: string) {
@@ -89,7 +91,10 @@ export class AuthService {
   }
 
   private async generateAndSendVerification(uid: string, email: string, displayName: string): Promise<void> {
-    const link = await this.firebaseAdmin.auth.generateEmailVerificationLink(email);
+    const frontendUrl = this.configService.get<string>('frontendUrl') || 'http://localhost:3000';
+    const link = await this.firebaseAdmin.auth.generateEmailVerificationLink(email, {
+      url: `${frontendUrl}/dashboard`,
+    });
     await this.mailService.sendEmailVerificationEmail(email, displayName, link);
   }
 }

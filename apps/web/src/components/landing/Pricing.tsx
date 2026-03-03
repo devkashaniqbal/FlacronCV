@@ -19,22 +19,22 @@ export default function Pricing() {
     {
       key: SubscriptionPlan.FREE,
       featured: false,
-      bestFor: 'Students & first-time job seekers',
+      bestFor: t('pricing.best_for_free'),
       cta: t('pricing.get_started'),
       ctaHref: '/register',
     },
     {
       key: SubscriptionPlan.PRO,
       featured: true,
-      bestFor: 'Active job seekers & career switchers',
+      bestFor: t('pricing.best_for_pro'),
       cta: t('pricing.upgrade'),
       ctaHref: '/register',
     },
     {
       key: SubscriptionPlan.ENTERPRISE,
       featured: false,
-      bestFor: 'Teams, recruiters & career coaches',
-      cta: 'Contact Sales',
+      bestFor: t('pricing.best_for_enterprise'),
+      cta: t('pricing.contact_sales'),
       ctaHref: '/contact-us',
     },
   ];
@@ -64,7 +64,7 @@ export default function Pricing() {
               )}
               onClick={() => setYearly(false)}
             >
-              Monthly
+              {t('pricing.monthly')}
             </button>
             <button
               className={cn(
@@ -75,36 +75,36 @@ export default function Pricing() {
               )}
               onClick={() => setYearly(true)}
             >
-              Yearly
+              {t('pricing.yearly')}
               <span className={cn(
                 'rounded-full px-2 py-0.5 text-[11px] font-bold transition-colors',
                 yearly
                   ? 'bg-white/20 text-white'
                   : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-400',
               )}>
-                Save 33%
+                {t('pricing.save')}
               </span>
             </button>
           </div>
         </div>
 
         {/* Trust strip */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-stone-500 dark:text-stone-400">
+        <div className="mt-8 grid grid-cols-2 items-center justify-items-center gap-x-4 gap-y-3 text-sm text-stone-500 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-8 sm:gap-y-2 dark:text-stone-400">
           <div className="flex items-center gap-2">
             <Lock className="h-4 w-4 text-emerald-500" />
-            Payments secured by Stripe
+            {t('pricing.trust_stripe')}
           </div>
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
-            We never sell your data
+            {t('pricing.trust_data')}
           </div>
           <div className="flex items-center gap-2">
             <Trash2 className="h-4 w-4 text-emerald-500" />
-            Cancel or delete anytime
+            {t('pricing.trust_cancel')}
           </div>
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
-            SSL encrypted &amp; GDPR compliant
+            {t('pricing.trust_ssl')}
           </div>
         </div>
 
@@ -169,20 +169,20 @@ export default function Pricing() {
                         {yearly ? (
                           <div className="mt-1.5 space-y-0.5">
                             <p className="text-sm text-stone-500 dark:text-stone-400">
-                              Billed as{' '}
+                              {t('pricing.billed_as')}{' '}
                               <span className="font-semibold text-stone-700 dark:text-stone-300">
                                 ${annualTotal.toFixed(2)}/year
                               </span>
                             </p>
                             {savingsPct > 0 && (
                               <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                                Save ${savingsAmount.toFixed(2)} compared to monthly
+                                {t('pricing.save_amount', { amount: savingsAmount.toFixed(2) })}
                               </p>
                             )}
                           </div>
                         ) : (
                           <p className="mt-1 text-xs text-stone-400 dark:text-stone-500">
-                            Switch to yearly and save {savingsPct > 0 ? `${savingsPct}%` : 'more'}
+                            {t('pricing.switch_yearly_save')} {savingsPct > 0 ? `${savingsPct}%` : ''}
                           </p>
                         )}
                       </>
@@ -216,7 +216,7 @@ export default function Pricing() {
 
         {/* Bottom note */}
         <p className="mt-8 text-center text-sm text-stone-500 dark:text-stone-400">
-          All plans include a <strong className="text-stone-700 dark:text-stone-300">14-day free trial</strong> on paid tiers. No credit card required for Free plan.
+          {t('pricing.trial_note')}
         </p>
       </div>
     </section>

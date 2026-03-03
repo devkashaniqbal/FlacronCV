@@ -14,6 +14,7 @@ import { SupportModule } from './modules/support/support.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { MailModule } from './modules/mail/mail.module';
+import { CRMModule } from './modules/crm/crm.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -41,6 +42,7 @@ import configuration from './config/configuration';
     SupportModule,
     AdminModule,
     AuditModule,
+    CRMModule,
   ],
 })
 export class AppModule {}

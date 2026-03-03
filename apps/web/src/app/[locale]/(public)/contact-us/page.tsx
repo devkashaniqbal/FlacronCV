@@ -75,7 +75,7 @@ export default function ContactUsPage() {
                 <Mail className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-medium text-stone-900 dark:text-white">Email</p>
+                <p className="font-medium text-stone-900 dark:text-white">{t('email_label')}</p>
                 <p className="text-sm text-stone-500 dark:text-stone-400">{t('info_email')}</p>
               </div>
             </div>
@@ -85,7 +85,7 @@ export default function ContactUsPage() {
                 <Clock className="h-5 w-5" />
               </div>
               <div>
-                <p className="font-medium text-stone-900 dark:text-white">Response Time</p>
+                <p className="font-medium text-stone-900 dark:text-white">{t('response_label')}</p>
                 <p className="text-sm text-stone-500 dark:text-stone-400">{t('info_response')}</p>
                 <p className="text-sm text-stone-500 dark:text-stone-400">{t('info_hours')}</p>
               </div>
@@ -93,8 +93,7 @@ export default function ContactUsPage() {
 
             <div className="rounded-xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-900 dark:bg-brand-950/50">
               <p className="text-sm font-medium text-brand-700 dark:text-brand-300">
-                💡 For account and billing issues, please open a support ticket from inside your
-                dashboard for faster resolution.
+                💡 {t('tip')}
               </p>
             </div>
           </div>
@@ -116,7 +115,7 @@ export default function ContactUsPage() {
                     setForm({ name: '', email: '', subject: '', category: 'general', message: '' });
                   }}
                 >
-                  Send Another Message
+                  {t('send_another')}
                 </Button>
               </Card>
             ) : (
@@ -149,7 +148,7 @@ export default function ContactUsPage() {
 
                   <div>
                     <label className="mb-1.5 block text-sm font-medium text-stone-700 dark:text-stone-300">
-                      Category
+                      {t('category_label')}
                     </label>
                     <select
                       name="category"

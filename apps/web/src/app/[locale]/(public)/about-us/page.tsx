@@ -120,7 +120,7 @@ export default async function AboutUsPage() {
             {t('values_title')}
           </h2>
           <p className="mb-10 text-center text-stone-500 dark:text-stone-400">
-            The principles that guide everything we build
+            {t('values_subtitle')}
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <ValueCard icon={Zap} title={t('value1_title')} desc={t('value1_desc')} />

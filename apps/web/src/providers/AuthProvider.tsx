@@ -9,8 +9,14 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
+  GoogleAuthProvider,
+  GithubAuthProvider,
+  linkWithCredential,
+  OAuthCredential,
 } from 'firebase/auth';
 import { auth, googleProvider, githubProvider, isConfigured } from '@/lib/firebase';
+
+const PENDING_CRED_KEY = 'flacroncv_pending_oauth_credential';
 import { api } from '@/lib/api';
 import { User } from '@flacroncv/shared-types';
 
@@ -22,7 +28,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
-  loginWithGithub: () => Promise<void>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendVerification: () => Promise<void>;
@@ -79,7 +84,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     if (!auth) throw new Error('Firebase not configured');
-    await signInWithEmailAndPassword(auth, email, password);
+    const result = await signInWithEmailAndPassword(auth, email, password);
+
+    // If a Google/GitHub credential was stored (account-exists-with-different-credential),
+    // link it now so the user can sign in with both methods going forward.
+    const pendingCredStr = sessionStorage.getItem(PENDING_CRED_KEY);
+    if (pendingCredStr) {
+      try {
+        const { provider, idToken, accessToken } = JSON.parse(pendingCredStr);
+        const pendingCred: OAuthCredential =
+          provider === 'github.com'
+            ? GithubAuthProvider.credential(accessToken)
+            : GoogleAuthProvider.credential(idToken, accessToken);
+        await linkWithCredential(result.user, pendingCred);
+      } catch (linkErr) {
+        console.error('Failed to link OAuth account:', linkErr);
+      } finally {
+        sessionStorage.removeItem(PENDING_CRED_KEY);
+      }
+    }
   };
 
   const register = async (email: string, password: string, name: string) => {
@@ -91,12 +114,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginWithGoogle = async () => {
     if (!auth) throw new Error('Firebase not configured');
-    await signInWithPopup(auth, googleProvider);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error: any) {
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        const pendingCred = GoogleAuthProvider.credentialFromError(error);
+        const email: string = error.customData?.email ?? '';
+        if (pendingCred) {
+          sessionStorage.setItem(PENDING_CRED_KEY, JSON.stringify({
+            provider: 'google.com',
+            idToken: (pendingCred as any).idToken ?? null,
+            accessToken: (pendingCred as any).accessToken ?? null,
+          }));
+          throw new Error(
+            `An account already exists for ${email}. Sign in with your password below and your Google account will be linked automatically.`,
+          );
+        }
+      }
+      throw error;
+    }
   };
 
   const loginWithGithub = async () => {
     if (!auth) throw new Error('Firebase not configured');
-    await signInWithPopup(auth, githubProvider);
+    try {
+      await signInWithPopup(auth, githubProvider);
+    } catch (error: any) {
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        const pendingCred = GithubAuthProvider.credentialFromError(error);
+        const email: string = error.customData?.email ?? '';
+        if (pendingCred) {
+          sessionStorage.setItem(PENDING_CRED_KEY, JSON.stringify({
+            provider: 'github.com',
+            accessToken: (pendingCred as any).accessToken ?? null,
+            idToken: null,
+          }));
+          throw new Error(
+            `An account already exists for ${email}. Sign in with your password below and your GitHub account will be linked automatically.`,
+          );
+        }
+      }
+      throw error;
+    }
   };
 
   const logout = async () => {
@@ -123,7 +182,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         loginWithGoogle,
-        loginWithGithub,
         logout,
         resetPassword,
         resendVerification,
