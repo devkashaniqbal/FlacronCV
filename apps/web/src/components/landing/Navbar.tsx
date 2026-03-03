@@ -151,13 +151,13 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center justify-between rounded-lg px-3 py-2">
-              <LanguageSwitcher />
               <button
                 className="rounded-lg p-2 text-stone-600 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800"
                 onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
               >
                 {resolvedTheme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
+              <LanguageSwitcher />
             </div>
 
             <hr className="border-stone-200 dark:border-stone-700" />
