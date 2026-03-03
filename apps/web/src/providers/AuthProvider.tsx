@@ -6,7 +6,8 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signOut,
   updateProfile,
   GoogleAuthProvider,
@@ -14,9 +15,11 @@ import {
   linkWithCredential,
   OAuthCredential,
 } from 'firebase/auth';
-import { auth, googleProvider, githubProvider, isConfigured } from '@/lib/firebase';
+import { auth, googleProvider, isConfigured } from '@/lib/firebase';
 
 const PENDING_CRED_KEY = 'flacroncv_pending_oauth_credential';
+export const GOOGLE_ERROR_KEY = 'flacroncv_google_error';
+
 import { api } from '@/lib/api';
 import { User } from '@flacroncv/shared-types';
 
@@ -46,6 +49,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Handle any pending redirect result from signInWithRedirect
+    getRedirectResult(auth).catch((error: any) => {
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        const pendingCred = GoogleAuthProvider.credentialFromError(error);
+        const email: string = error.customData?.email ?? '';
+        if (pendingCred) {
+          sessionStorage.setItem(PENDING_CRED_KEY, JSON.stringify({
+            provider: 'google.com',
+            idToken: (pendingCred as any).idToken ?? null,
+            accessToken: (pendingCred as any).accessToken ?? null,
+          }));
+          sessionStorage.setItem(
+            GOOGLE_ERROR_KEY,
+            `An account already exists for ${email}. Sign in with your password below and your Google account will be linked automatically.`,
+          );
+        }
+      }
+    });
+
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
       if (fbUser) {
@@ -54,7 +76,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(userData);
         } catch (error) {
           console.error('Failed to sync user with backend:', error);
-          // Fallback: create user from Firebase data when backend is unavailable
           setUser({
             uid: fbUser.uid,
             email: fbUser.email || '',
@@ -109,53 +130,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth) throw new Error('Firebase not configured');
     const result = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(result.user, { displayName: name });
-    // Verification email is sent automatically by the backend on first verifyAndSync call
   };
 
   const loginWithGoogle = async () => {
     if (!auth) throw new Error('Firebase not configured');
-    try {
-      await signInWithPopup(auth, googleProvider);
-    } catch (error: any) {
-      if (error.code === 'auth/account-exists-with-different-credential') {
-        const pendingCred = GoogleAuthProvider.credentialFromError(error);
-        const email: string = error.customData?.email ?? '';
-        if (pendingCred) {
-          sessionStorage.setItem(PENDING_CRED_KEY, JSON.stringify({
-            provider: 'google.com',
-            idToken: (pendingCred as any).idToken ?? null,
-            accessToken: (pendingCred as any).accessToken ?? null,
-          }));
-          throw new Error(
-            `An account already exists for ${email}. Sign in with your password below and your Google account will be linked automatically.`,
-          );
-        }
-      }
-      throw error;
-    }
-  };
-
-  const loginWithGithub = async () => {
-    if (!auth) throw new Error('Firebase not configured');
-    try {
-      await signInWithPopup(auth, githubProvider);
-    } catch (error: any) {
-      if (error.code === 'auth/account-exists-with-different-credential') {
-        const pendingCred = GithubAuthProvider.credentialFromError(error);
-        const email: string = error.customData?.email ?? '';
-        if (pendingCred) {
-          sessionStorage.setItem(PENDING_CRED_KEY, JSON.stringify({
-            provider: 'github.com',
-            accessToken: (pendingCred as any).accessToken ?? null,
-            idToken: null,
-          }));
-          throw new Error(
-            `An account already exists for ${email}. Sign in with your password below and your GitHub account will be linked automatically.`,
-          );
-        }
-      }
-      throw error;
-    }
+    // signInWithRedirect avoids COOP popup issues entirely
+    await signInWithRedirect(auth, googleProvider);
   };
 
   const logout = async () => {
@@ -178,7 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         firebaseUser,
         user,
         loading,
-        emailVerified: firebaseUser?.emailVerified ?? true, // true for Google/GitHub (always verified)
+        emailVerified: firebaseUser?.emailVerified ?? true,
         login,
         register,
         loginWithGoogle,

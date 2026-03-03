@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth, GOOGLE_ERROR_KEY } from '@/providers/AuthProvider';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { toast } from 'sonner';
@@ -29,29 +29,48 @@ function getPostLoginRedirect(): string {
 
 export default function LoginPage() {
   const t = useTranslations('auth');
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, user, loading } = useAuth();
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const redirectHandled = useRef(false);
+
+  // Show Google auth error stored by redirect flow (e.g. account-exists error)
+  useEffect(() => {
+    const err = sessionStorage.getItem(GOOGLE_ERROR_KEY);
+    if (err) {
+      sessionStorage.removeItem(GOOGLE_ERROR_KEY);
+      toast.error(err);
+    }
+  }, []);
+
+  // Redirect after returning from Google sign-in redirect
+  useEffect(() => {
+    if (!loading && user && !redirectHandled.current) {
+      redirectHandled.current = true;
+      router.push(getPostLoginRedirect());
+    }
+  }, [user, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setFormLoading(true);
     try {
       await login(email, password);
+      redirectHandled.current = true;
       router.push(getPostLoginRedirect());
     } catch (error) {
       toast.error((error as Error).message || 'Login failed');
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
   const handleGoogle = async () => {
     try {
       await loginWithGoogle();
-      router.push(getPostLoginRedirect());
+      // Browser navigates away — redirect is handled by useEffect on return
     } catch (error) {
       toast.error((error as Error).message || 'Google sign-in failed');
     }
@@ -112,7 +131,7 @@ export default function LoginPage() {
             </Link>
           </div>
         </div>
-        <Button type="submit" loading={loading} className="w-full" size="lg">
+        <Button type="submit" loading={formLoading} className="w-full" size="lg">
           {t('login_btn')}
         </Button>
       </form>

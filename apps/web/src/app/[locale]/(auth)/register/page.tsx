@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
-import { useAuth } from '@/providers/AuthProvider';
+import { useAuth, GOOGLE_ERROR_KEY } from '@/providers/AuthProvider';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { toast } from 'sonner';
@@ -29,12 +29,30 @@ function getPostLoginRedirect(): string {
 
 export default function RegisterPage() {
   const t = useTranslations('auth');
-  const { register, loginWithGoogle } = useAuth();
+  const { register, loginWithGoogle, user, loading } = useAuth();
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
+  const redirectHandled = useRef(false);
+
+  // Show Google auth error stored by redirect flow (e.g. account-exists error)
+  useEffect(() => {
+    const err = sessionStorage.getItem(GOOGLE_ERROR_KEY);
+    if (err) {
+      sessionStorage.removeItem(GOOGLE_ERROR_KEY);
+      toast.error(err);
+    }
+  }, []);
+
+  // Redirect after returning from Google sign-in redirect
+  useEffect(() => {
+    if (!loading && user && !redirectHandled.current) {
+      redirectHandled.current = true;
+      router.push(getPostLoginRedirect());
+    }
+  }, [user, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,21 +60,22 @@ export default function RegisterPage() {
       toast.error('Password must be at least 8 characters');
       return;
     }
-    setLoading(true);
+    setFormLoading(true);
     try {
       await register(email, password, name);
+      redirectHandled.current = true;
       router.push('/verify-email');
     } catch (error) {
       toast.error((error as Error).message || 'Registration failed');
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
   const handleGoogle = async () => {
     try {
       await loginWithGoogle();
-      router.push(getPostLoginRedirect());
+      // Browser navigates away — redirect is handled by useEffect on return
     } catch (error) {
       toast.error((error as Error).message || 'Google sign-in failed');
     }
@@ -94,7 +113,7 @@ export default function RegisterPage() {
         <Input id="name" type="text" label={t('name')} value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" required />
         <Input id="email" type="email" label={t('email')} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" required />
         <Input id="password" type="password" label={t('password')} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" hint="Minimum 8 characters" required />
-        <Button type="submit" loading={loading} className="w-full" size="lg">
+        <Button type="submit" loading={formLoading} className="w-full" size="lg">
           {t('register_btn')}
         </Button>
       </form>
