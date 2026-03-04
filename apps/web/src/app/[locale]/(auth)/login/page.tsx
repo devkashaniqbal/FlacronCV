@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/routing';
 import { useAuth, GOOGLE_ERROR_KEY } from '@/providers/AuthProvider';
+import { auth } from '@/lib/firebase';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { toast } from 'sonner';
@@ -70,8 +71,12 @@ export default function LoginPage() {
   const handleGoogle = async () => {
     try {
       await loginWithGoogle();
-      redirectHandled.current = true;
-      router.push(getPostLoginRedirect());
+      // loginWithGoogle returns without throwing when popup is dismissed (no-op)
+      // Only redirect if Firebase actually signed us in
+      if (auth?.currentUser) {
+        redirectHandled.current = true;
+        router.push(getPostLoginRedirect());
+      }
     } catch (error) {
       toast.error((error as Error).message || 'Google sign-in failed');
     }

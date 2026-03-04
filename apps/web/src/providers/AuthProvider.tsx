@@ -126,11 +126,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             idToken: (pendingCred as any).idToken ?? null,
             accessToken: (pendingCred as any).accessToken ?? null,
           }));
-          sessionStorage.setItem(
-            GOOGLE_ERROR_KEY,
-            `An account already exists for ${email}. Sign in with your password below and your Google account will be linked automatically.`,
-          );
         }
+        const msg = `An account already exists for ${email}. Sign in with your password below and your Google account will be linked automatically.`;
+        sessionStorage.setItem(GOOGLE_ERROR_KEY, msg);
+        throw new Error(msg);
+      } else if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
+        // User dismissed — silent
+        return;
+      } else if (error.code === 'auth/popup-blocked') {
+        throw new Error('Popup was blocked by your browser. Please allow popups for this site and try again.');
       } else {
         throw error;
       }
