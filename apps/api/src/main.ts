@@ -15,12 +15,18 @@ async function bootstrap() {
   app.use(helmet());
 
   // CORS configuration - dynamically validate origins
-  const frontendUrl = process.env.FRONTEND_URL?.replace(/\/$/, ''); // Remove trailing slash
+  const frontendUrl = process.env.FRONTEND_URL?.replace(/\/$/, '');
+  const extraOrigins = (process.env.ADDITIONAL_ORIGINS ?? '')
+    .split(',')
+    .map((o) => o.trim().replace(/\/$/, ''))
+    .filter(Boolean);
+
   const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001',
     frontendUrl,
-  ].filter(Boolean) as string[]; // Type assertion: filter removes undefined values
+    ...extraOrigins,
+  ].filter(Boolean) as string[];
 
   app.enableCors({
     origin: (origin, callback) => {
