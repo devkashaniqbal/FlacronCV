@@ -75,7 +75,8 @@ export default function RegisterPage() {
   const handleGoogle = async () => {
     try {
       await loginWithGoogle();
-      // Browser navigates away — redirect is handled by useEffect on return
+      redirectHandled.current = true;
+      router.push(getPostLoginRedirect());
     } catch (error) {
       toast.error((error as Error).message || 'Google sign-in failed');
     }

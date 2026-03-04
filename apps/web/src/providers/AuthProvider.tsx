@@ -6,8 +6,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   signOut,
   updateProfile,
   GoogleAuthProvider,
@@ -48,25 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
       return;
     }
-
-    // Handle any pending redirect result from signInWithRedirect
-    getRedirectResult(auth).catch((error: any) => {
-      if (error.code === 'auth/account-exists-with-different-credential') {
-        const pendingCred = GoogleAuthProvider.credentialFromError(error);
-        const email: string = error.customData?.email ?? '';
-        if (pendingCred) {
-          sessionStorage.setItem(PENDING_CRED_KEY, JSON.stringify({
-            provider: 'google.com',
-            idToken: (pendingCred as any).idToken ?? null,
-            accessToken: (pendingCred as any).accessToken ?? null,
-          }));
-          sessionStorage.setItem(
-            GOOGLE_ERROR_KEY,
-            `An account already exists for ${email}. Sign in with your password below and your Google account will be linked automatically.`,
-          );
-        }
-      }
-    });
 
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
@@ -134,8 +114,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginWithGoogle = async () => {
     if (!auth) throw new Error('Firebase not configured');
-    // signInWithRedirect avoids COOP popup issues entirely
-    await signInWithRedirect(auth, googleProvider);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error: any) {
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        const pendingCred = GoogleAuthProvider.credentialFromError(error);
+        const email: string = error.customData?.email ?? '';
+        if (pendingCred) {
+          sessionStorage.setItem(PENDING_CRED_KEY, JSON.stringify({
+            provider: 'google.com',
+            idToken: (pendingCred as any).idToken ?? null,
+            accessToken: (pendingCred as any).accessToken ?? null,
+          }));
+          sessionStorage.setItem(
+            GOOGLE_ERROR_KEY,
+            `An account already exists for ${email}. Sign in with your password below and your Google account will be linked automatically.`,
+          );
+        }
+      } else {
+        throw error;
+      }
+    }
   };
 
   const logout = async () => {

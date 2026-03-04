@@ -8,6 +8,8 @@ services:
     buildCommand: npm install -g pnpm@8.15.0 && pnpm install --prod=false && pnpm build:api
     startCommand: NODE_ENV=production node apps/api/dist/main.js
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: PORT
         value: 4000
       - key: FRONTEND_URL
@@ -40,6 +42,18 @@ services:
         sync: false
       - key: STRIPE_ENTERPRISE_YEARLY_PRICE_ID
         sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: BREVO_FROM_EMAIL
+        sync: false
+      - key: BREVO_FROM_NAME
+        sync: false
+      - key: BREVO_TEMPLATE_WELCOME
+        sync: false
+      - key: BREVO_TEMPLATE_VERIFICATION
+        sync: false
+      - key: BREVO_TEMPLATE_PASSWORD_RESET
+        sync: false
 
   # Frontend Web App
   - type: web
@@ -50,9 +64,11 @@ services:
     buildCommand: npm install -g pnpm@8.15.0 && pnpm install --prod=false && pnpm build:web
     startCommand: NODE_ENV=production pnpm start:web
     envVars:
+      - key: NODE_ENV
+        value: production
       - key: NEXT_PUBLIC_API_URL
         value: https://flacroncv-api.onrender.com/api/v1
-      - key: NEXT_PUBLIC_SITE_URL
+      - key: NEXT_PUBLIC_APP_URL
         value: https://flacroncv-web.onrender.com
       - key: NEXT_PUBLIC_FIREBASE_API_KEY
         sync: false
@@ -65,4 +81,6 @@ services:
       - key: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
         sync: false
       - key: NEXT_PUBLIC_FIREBASE_APP_ID
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
         sync: false
