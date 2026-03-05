@@ -8,25 +8,22 @@ import { Mail, RefreshCw, LogOut } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function VerifyEmailPage() {
-  const { firebaseUser, logout, resendVerification } = useAuth();
+  const { firebaseUser, emailVerified, logout, resendVerification, refreshEmailVerified } = useAuth();
   const router = useRouter();
   const [resending, setResending] = useState(false);
   const [checking, setChecking] = useState(false);
 
   const checkVerification = useCallback(async () => {
     if (!firebaseUser) return;
-    await firebaseUser.reload();
-    if (firebaseUser.emailVerified) {
-      router.push('/dashboard');
-    }
-  }, [firebaseUser, router]);
+    await refreshEmailVerified();
+  }, [firebaseUser, refreshEmailVerified]);
 
   useEffect(() => {
     if (!firebaseUser) {
       router.push('/login');
       return;
     }
-    if (firebaseUser.emailVerified) {
+    if (emailVerified) {
       router.push('/dashboard');
       return;
     }
@@ -34,7 +31,7 @@ export default function VerifyEmailPage() {
     // Poll every 4 seconds for verification
     const interval = setInterval(checkVerification, 4000);
     return () => clearInterval(interval);
-  }, [firebaseUser, router, checkVerification]);
+  }, [firebaseUser, emailVerified, router, checkVerification]);
 
   const handleResend = async () => {
     setResending(true);

@@ -33,6 +33,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
   resendVerification: () => Promise<void>;
+  refreshEmailVerified: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [emailVerified, setEmailVerified] = useState(false);
 
   useEffect(() => {
     if (!isConfigured || !auth) {
@@ -50,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       setFirebaseUser(fbUser);
+      setEmailVerified(fbUser?.emailVerified ?? false);
       if (fbUser) {
         try {
           const userData = await api.post<User>('/auth/verify');
@@ -155,19 +158,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await api.post('/auth/send-verification');
   };
 
+  const refreshEmailVerified = async () => {
+    if (!auth?.currentUser) return;
+    await auth.currentUser.reload();
+    setEmailVerified(auth.currentUser.emailVerified);
+  };
+
   return (
     <AuthContext.Provider
       value={{
         firebaseUser,
         user,
         loading,
-        emailVerified: firebaseUser?.emailVerified ?? true,
+        emailVerified,
         login,
         register,
         loginWithGoogle,
         logout,
         resetPassword,
         resendVerification,
+        refreshEmailVerified,
       }}
     >
       {children}
