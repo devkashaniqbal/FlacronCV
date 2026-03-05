@@ -113,7 +113,8 @@ export async function exportToPDF(cv: CV, sections: CVSection[]): Promise<void> 
 
   try {
     const html2canvas = (await import('html2canvas')).default;
-    const { jsPDF } = await import('jspdf');
+    const jsPDFModule = await import('jspdf');
+    const jsPDF = jsPDFModule.jsPDF ?? (jsPDFModule as any).default;
 
     const canvas = await html2canvas(iframeDoc.body, {
       scale: 2, // Higher DPI for better quality
@@ -133,10 +134,11 @@ export async function exportToPDF(cv: CV, sections: CVSection[]): Promise<void> 
     const imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
     // Handle multi-page if content is longer than one page
+    // Use a 2mm threshold to avoid a near-blank extra page from sub-pixel overflow
     let position = 0;
     let remaining = imgHeight;
 
-    while (remaining > 0) {
+    while (remaining > 2) {
       if (position > 0) pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, -position, imgWidth, imgHeight);
       position += pdfHeight;
