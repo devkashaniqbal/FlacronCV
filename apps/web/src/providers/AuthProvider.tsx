@@ -9,6 +9,7 @@ import {
   signInWithPopup,
   signOut,
   updateProfile,
+  sendEmailVerification,
   GoogleAuthProvider,
   GithubAuthProvider,
   linkWithCredential,
@@ -152,7 +153,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const resendVerification = async () => {
-    await api.post('/auth/send-verification');
+    if (!auth?.currentUser) throw new Error('No user signed in');
+    await sendEmailVerification(auth.currentUser, {
+      url: `${window.location.origin}/dashboard`,
+    });
   };
 
   return (
