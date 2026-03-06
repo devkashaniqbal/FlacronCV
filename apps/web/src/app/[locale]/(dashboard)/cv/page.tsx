@@ -7,16 +7,18 @@ import { api } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
-import { Plus, FileText, MoreVertical, Trash2, Copy, ExternalLink, Loader2, Sparkles } from 'lucide-react';
+import { Plus, FileText, MoreVertical, Trash2, Copy, Pencil, Sparkles, AlertTriangle } from 'lucide-react';
 import Skeleton from '@/components/ui/Skeleton';
 import { CV } from '@flacroncv/shared-types';
 import { formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { useRouter } from '@/i18n/routing';
 
 export default function CVListPage() {
   const t = useTranslations();
   const queryClient = useQueryClient();
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['cvs'],
@@ -28,6 +30,11 @@ export default function CVListPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cvs'] });
       toast.success('CV deleted');
+      setConfirmDeleteId(null);
+    },
+    onError: () => {
+      toast.error('Failed to delete CV. Please try again.');
+      setConfirmDeleteId(null);
     },
   });
 
@@ -36,6 +43,9 @@ export default function CVListPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cvs'] });
       toast.success('CV duplicated');
+    },
+    onError: () => {
+      toast.error('Failed to duplicate CV. Please try again.');
     },
   });
 
@@ -87,10 +97,43 @@ export default function CVListPage() {
             <CVCard
               key={cv.id}
               cv={cv}
-              onDelete={() => deleteMutation.mutate(cv.id)}
+              onDelete={() => setConfirmDeleteId(cv.id)}
               onDuplicate={() => duplicateMutation.mutate(cv.id)}
+              duplicating={duplicateMutation.isPending}
             />
           ))}
+        </div>
+      )}
+
+      {/* Delete confirmation modal */}
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-sm rounded-xl border border-stone-200 bg-white p-6 shadow-xl dark:border-stone-700 dark:bg-stone-900">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+              <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-stone-900 dark:text-white">Delete CV?</h3>
+            <p className="mt-2 text-sm text-stone-500 dark:text-stone-400">
+              This action cannot be undone. The CV will be permanently deleted.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <Button
+                variant="secondary"
+                className="flex-1"
+                onClick={() => setConfirmDeleteId(null)}
+                disabled={deleteMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 !bg-red-600 hover:!bg-red-700"
+                loading={deleteMutation.isPending}
+                onClick={() => deleteMutation.mutate(confirmDeleteId)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -101,12 +144,15 @@ function CVCard({
   cv,
   onDelete,
   onDuplicate,
+  duplicating,
 }: {
   cv: CV;
   onDelete: () => void;
   onDuplicate: () => void;
+  duplicating?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <Card hover padding="none" className="overflow-hidden">
@@ -150,7 +196,14 @@ function CVCard({
                 <div className="absolute end-0 z-20 mt-1 w-36 rounded-lg border border-stone-200 bg-white py-1 shadow-lg dark:border-stone-700 dark:bg-stone-800">
                   <button
                     className="flex w-full items-center gap-2 px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-50 dark:text-stone-400 dark:hover:bg-stone-700"
+                    onClick={() => { setMenuOpen(false); router.push(`/cv/${cv.id}`); }}
+                  >
+                    <Pencil className="h-4 w-4" /> Edit
+                  </button>
+                  <button
+                    className="flex w-full items-center gap-2 px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-50 dark:text-stone-400 dark:hover:bg-stone-700"
                     onClick={() => { onDuplicate(); setMenuOpen(false); }}
+                    disabled={duplicating}
                   >
                     <Copy className="h-4 w-4" /> Duplicate
                   </button>

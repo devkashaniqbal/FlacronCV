@@ -4,7 +4,7 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ['jspdf', 'html2canvas'],
+  transpilePackages: ['jspdf', 'html2canvas', 'docx', 'file-saver'],
   images: {
     domains: ['firebasestorage.googleapis.com', 'lh3.googleusercontent.com'],
   },
