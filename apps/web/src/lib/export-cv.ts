@@ -112,7 +112,8 @@ export async function exportToPDF(cv: CV, sections: CVSection[]): Promise<void> 
   await new Promise((r) => setTimeout(r, 500));
 
   try {
-    const html2canvas = (await import('html2canvas')).default;
+    const h2cModule = await import('html2canvas');
+    const html2canvas = h2cModule.default ?? (h2cModule as any).html2canvas;
     const jsPDFModule = await import('jspdf');
     const jsPDF = jsPDFModule.jsPDF ?? (jsPDFModule as any).default;
 
