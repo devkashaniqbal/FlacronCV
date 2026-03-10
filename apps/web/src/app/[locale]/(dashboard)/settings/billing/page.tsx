@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { api } from '@/lib/api';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -24,13 +25,47 @@ import {
   X,
   ExternalLink,
   Receipt,
+  Loader2,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function BillingPage() {
   const t = useTranslations('billing');
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
+  const searchParams = useSearchParams();
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
+  const [syncingPlan, setSyncingPlan] = useState(false);
+  const [syncSuccess, setSyncSuccess] = useState(false);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // After Stripe redirects back with ?success=true, poll until plan updates
+  useEffect(() => {
+    if (searchParams.get('success') !== 'true') return;
+    const planAtRedirect = user?.subscription?.plan ?? 'free';
+    if (planAtRedirect !== 'free') {
+      // Already updated before we even mounted
+      setSyncSuccess(true);
+      return;
+    }
+
+    setSyncingPlan(true);
+    let attempts = 0;
+    const MAX_ATTEMPTS = 15; // 30 seconds
+
+    pollRef.current = setInterval(async () => {
+      attempts++;
+      await refreshUser();
+      const latestPlan = user?.subscription?.plan ?? 'free';
+      if (latestPlan !== 'free' || attempts >= MAX_ATTEMPTS) {
+        clearInterval(pollRef.current!);
+        setSyncingPlan(false);
+        if (latestPlan !== 'free') setSyncSuccess(true);
+      }
+    }, 2000);
+
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const currentPlan = user?.subscription?.plan || SubscriptionPlan.FREE;
   const currentPlanConfig = PLAN_CONFIGS[currentPlan];
@@ -193,6 +228,26 @@ export default function BillingPage() {
 
   return (
     <div className="space-y-8">
+      {/* Post-checkout sync banner */}
+      {syncingPlan && (
+        <div className="flex items-center gap-3 rounded-xl border border-brand-200 bg-brand-50 px-5 py-4 dark:border-brand-800 dark:bg-brand-900/20">
+          <Loader2 className="h-5 w-5 animate-spin text-brand-600 dark:text-brand-400" />
+          <div>
+            <p className="font-semibold text-brand-800 dark:text-brand-300">Setting up your subscription…</p>
+            <p className="text-sm text-brand-600 dark:text-brand-400">This usually takes a few seconds. Your new plan and credits will appear shortly.</p>
+          </div>
+        </div>
+      )}
+      {syncSuccess && !syncingPlan && (
+        <div className="flex items-center gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 dark:border-emerald-800 dark:bg-emerald-900/20">
+          <Check className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+          <div>
+            <p className="font-semibold text-emerald-800 dark:text-emerald-300">Subscription activated!</p>
+            <p className="text-sm text-emerald-600 dark:text-emerald-400">Your plan has been upgraded. Enjoy your new features and credits.</p>
+          </div>
+        </div>
+      )}
+
       {/* Current Plan */}
       <Card>
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">

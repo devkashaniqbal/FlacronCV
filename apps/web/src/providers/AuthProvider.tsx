@@ -34,6 +34,7 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<void>;
   resendVerification: () => Promise<void>;
   refreshEmailVerified: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -164,6 +165,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setEmailVerified(auth.currentUser.emailVerified);
   };
 
+  const refreshUser = async () => {
+    try {
+      const userData = await api.post<User>('/auth/verify');
+      setUser(userData);
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -178,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         resetPassword,
         resendVerification,
         refreshEmailVerified,
+        refreshUser,
       }}
     >
       {children}
