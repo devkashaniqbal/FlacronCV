@@ -9,16 +9,25 @@ import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import { Plus, FileText, MoreVertical, Trash2, Copy, Pencil, Sparkles, AlertTriangle } from 'lucide-react';
 import Skeleton from '@/components/ui/Skeleton';
-import { CV } from '@flacroncv/shared-types';
+import { CV, PLAN_CONFIGS } from '@flacroncv/shared-types';
 import { formatDate } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { useRouter } from '@/i18n/routing';
+import { useAuth } from '@/providers/AuthProvider';
+import UpgradeModal from '@/components/shared/UpgradeModal';
 
 export default function CVListPage() {
   const t = useTranslations();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
+  const planLimits = PLAN_CONFIGS[user?.subscription?.plan ?? 'free'].limits;
+  const cvLimit = planLimits.cvs;
+  const cvsCreated = user?.usage?.cvsCreated ?? 0;
+  const atLimit = cvLimit !== 'unlimited' && cvsCreated >= cvLimit;
 
   const { data, isLoading } = useQuery({
     queryKey: ['cvs'],
@@ -55,9 +64,15 @@ export default function CVListPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-stone-900 dark:text-white">{t('dashboard.my_cvs')}</h1>
-        <Link href="/cv/new">
-          <Button icon={<Plus className="h-4 w-4" />}>{t('dashboard.create_cv')}</Button>
-        </Link>
+        {atLimit ? (
+          <Button icon={<Plus className="h-4 w-4" />} onClick={() => setShowUpgrade(true)}>
+            {t('dashboard.create_cv')}
+          </Button>
+        ) : (
+          <Link href="/cv/new">
+            <Button icon={<Plus className="h-4 w-4" />}>{t('dashboard.create_cv')}</Button>
+          </Link>
+        )}
       </div>
 
       {isLoading ? (
@@ -104,6 +119,12 @@ export default function CVListPage() {
           ))}
         </div>
       )}
+
+      <UpgradeModal
+        isOpen={showUpgrade}
+        onClose={() => setShowUpgrade(false)}
+        reason="cv_limit"
+      />
 
       {/* Delete confirmation modal */}
       {confirmDeleteId && (

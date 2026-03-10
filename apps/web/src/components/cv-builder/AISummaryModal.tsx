@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useCVStore } from '@/store/cv-store';
+import { useAuth } from '@/providers/AuthProvider';
 import { api } from '@/lib/api';
 import Button from '@/components/ui/Button';
+import UpgradeModal from '@/components/shared/UpgradeModal';
 import { X, Sparkles, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -17,6 +19,7 @@ interface AISummaryModalProps {
 export default function AISummaryModal({ cvId, open, onClose }: AISummaryModalProps) {
   const t = useTranslations('cv_builder');
   const { updatePersonalInfo } = useCVStore();
+  const { user } = useAuth();
 
   const [profession, setProfession] = useState('');
   const [experienceLevel, setExperienceLevel] = useState('mid_level');
@@ -25,10 +28,19 @@ export default function AISummaryModal({ cvId, open, onClose }: AISummaryModalPr
   const [generatedSummary, setGeneratedSummary] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   if (!open) return null;
 
+  const creditsUsed = user?.usage?.aiCreditsUsed ?? 0;
+  const creditsLimit = user?.usage?.aiCreditsLimit ?? 5;
+  const outOfCredits = creditsUsed >= creditsLimit;
+
   const handleGenerate = async () => {
+    if (outOfCredits) {
+      setShowUpgrade(true);
+      return;
+    }
     if (!profession.trim()) {
       toast.error('Please enter your profession');
       return;
@@ -187,8 +199,18 @@ export default function AISummaryModal({ cvId, open, onClose }: AISummaryModalPr
         <div className="flex items-center justify-end gap-2 border-t border-stone-200 px-5 py-3 dark:border-stone-700">
           {!generatedSummary ? (
             <>
+              {outOfCredits && (
+                <span className="me-auto text-xs text-red-500">
+                  No AI credits remaining
+                </span>
+              )}
+              {!outOfCredits && (
+                <span className="me-auto text-xs text-stone-400">
+                  {creditsLimit - creditsUsed} credits left
+                </span>
+              )}
               <Button variant="ghost" size="sm" onClick={handleClose}>
-                {t('use_this') === 'Use This' ? 'Cancel' : t('use_this')}
+                Cancel
               </Button>
               <Button
                 variant="primary"
@@ -196,8 +218,9 @@ export default function AISummaryModal({ cvId, open, onClose }: AISummaryModalPr
                 icon={<Sparkles className="h-4 w-4" />}
                 loading={isGenerating}
                 onClick={handleGenerate}
+                disabled={outOfCredits}
               >
-                {isGenerating ? t('generating') : t('generate_with_ai')}
+                {isGenerating ? t('generating') : outOfCredits ? 'Upgrade to Generate' : t('generate_with_ai')}
               </Button>
             </>
           ) : (
@@ -221,5 +244,11 @@ export default function AISummaryModal({ cvId, open, onClose }: AISummaryModalPr
         </div>
       </div>
     </div>
+
+    <UpgradeModal
+      isOpen={showUpgrade}
+      onClose={() => setShowUpgrade(false)}
+      reason="ai_credits"
+    />
   );
 }

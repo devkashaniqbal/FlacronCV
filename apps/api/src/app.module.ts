@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 import { FirebaseModule } from './modules/firebase/firebase.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
@@ -29,6 +30,7 @@ import configuration from './config/configuration';
         limit: 100,
       },
     ]),
+    ScheduleModule.forRoot(),
     FirebaseModule,
     MailModule,
     AuthModule,

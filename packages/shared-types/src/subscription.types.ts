@@ -106,8 +106,6 @@ export const PLAN_CONFIGS: Record<SubscriptionPlan, PlanConfig> = {
       'Unlimited exports',
       'PDF & DOCX export',
       'Priority support',
-      'Custom branding',
-      'Team collaboration',
     ],
   },
 };

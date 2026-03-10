@@ -189,18 +189,6 @@ export default function BillingPage() {
       pro: true,
       enterprise: true,
     },
-    {
-      label: t('features.customBranding'),
-      free: false,
-      pro: false,
-      enterprise: true,
-    },
-    {
-      label: t('features.teamCollab'),
-      free: false,
-      pro: false,
-      enterprise: true,
-    },
   ];
 
   return (
@@ -290,7 +278,9 @@ export default function BillingPage() {
               </h4>
               <div className="mt-2 flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-stone-900 dark:text-white">
-                  ${billingInterval === 'yearly' ? '359.99' : '29.99'}
+                  ${billingInterval === 'yearly'
+                    ? PLAN_CONFIGS[SubscriptionPlan.PRO].priceYearly.toFixed(2)
+                    : PLAN_CONFIGS[SubscriptionPlan.PRO].priceMonthly.toFixed(2)}
                 </span>
                 <span className="text-sm text-stone-500 dark:text-stone-400">
                   /{billingInterval === 'yearly' ? 'year' : 'month'}
@@ -323,7 +313,9 @@ export default function BillingPage() {
               </h4>
               <div className="mt-2 flex items-baseline gap-1">
                 <span className="text-3xl font-bold text-stone-900 dark:text-white">
-                  ${billingInterval === 'yearly' ? '1,199' : '99.99'}
+                  ${billingInterval === 'yearly'
+                    ? PLAN_CONFIGS[SubscriptionPlan.ENTERPRISE].priceYearly.toFixed(2)
+                    : PLAN_CONFIGS[SubscriptionPlan.ENTERPRISE].priceMonthly.toFixed(2)}
                 </span>
                 <span className="text-sm text-stone-500 dark:text-stone-400">
                   /{billingInterval === 'yearly' ? 'year' : 'month'}

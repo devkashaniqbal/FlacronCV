@@ -5,7 +5,6 @@ import {
   UnauthorizedException,
   Logger,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { FirebaseAdminService } from '../../modules/firebase/firebase-admin.service';
 
 @Injectable()
@@ -14,7 +13,6 @@ export class FirebaseAuthGuard implements CanActivate {
 
   constructor(
     private readonly firebaseAdmin: FirebaseAdminService,
-    private readonly configService: ConfigService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -36,27 +34,6 @@ export class FirebaseAuthGuard implements CanActivate {
       };
       return true;
     } catch (error) {
-      // In development, decode JWT without verification as fallback
-      const isDev = this.configService.get<string>('nodeEnv') === 'development';
-      if (isDev) {
-        try {
-          const payload = this.decodeJwtPayload(token);
-          if (payload && payload.user_id) {
-            this.logger.warn(`Dev mode: Using unverified token for user ${payload.user_id}`);
-            request.user = {
-              uid: payload.user_id,
-              email: payload.email || '',
-              role: payload.role || 'user',
-              emailVerified: payload.email_verified || false,
-              ...payload,
-            };
-            return true;
-          }
-        } catch (decodeError) {
-          this.logger.warn(`Dev mode: Failed to decode JWT: ${(decodeError as Error).message}`);
-        }
-      }
-
       this.logger.warn(`Token verification failed: ${(error as Error).message}`);
       throw new UnauthorizedException('Invalid or expired token');
     }
@@ -69,14 +46,5 @@ export class FirebaseAuthGuard implements CanActivate {
     return type === 'Bearer' ? token : null;
   }
 
-  private decodeJwtPayload(token: string): Record<string, any> | null {
-    try {
-      const parts = token.split('.');
-      if (parts.length !== 3) return null;
-      const payload = Buffer.from(parts[1], 'base64url').toString('utf8');
-      return JSON.parse(payload);
-    } catch {
-      return null;
-    }
-  }
+
 }

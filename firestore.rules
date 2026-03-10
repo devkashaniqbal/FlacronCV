@@ -1,8 +1,93 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.role == 'admin' ||
+        request.auth.token.role == 'super_admin'
+      );
+    }
+
+    // Users — read own doc only; writes go through Admin SDK (backend)
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if false;
+    }
+
+    // CVs — read own CVs only; writes go through Admin SDK
+    match /cvs/{cvId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid ||
+        resource.data.isPublic == true ||
+        isAdmin()
+      );
+      allow write: if false;
+
+      match /sections/{sectionId} {
+        allow read: if isSignedIn() && (
+          get(/databases/$(database)/documents/cvs/$(cvId)).data.userId == request.auth.uid ||
+          isAdmin()
+        );
+        allow write: if false;
+      }
+
+      match /versions/{versionId} {
+        allow read: if isSignedIn() && (
+          get(/databases/$(database)/documents/cvs/$(cvId)).data.userId == request.auth.uid ||
+          isAdmin()
+        );
+        allow write: if false;
+      }
+    }
+
+    // Cover Letters — read own only
+    match /cover_letters/{letterId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow write: if false;
+    }
+
+    // Support Tickets — read own only
+    match /support_tickets/{ticketId} {
+      allow read: if isSignedIn() && (
+        resource.data.userId == request.auth.uid || isAdmin()
+      );
+      allow write: if false;
+    }
+
+    // Templates — public read, no client writes
+    match /templates/{templateId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // CRM — admin only
+    match /crm_customers/{doc} {
+      allow read, write: if isAdmin();
+    }
+    match /crm_leads/{doc} {
+      allow read, write: if isAdmin();
+    }
+    match /crm_transactions/{doc} {
+      allow read, write: if isAdmin();
+    }
+    match /crm_activities/{doc} {
+      allow read, write: if isAdmin();
+    }
+
+    // Deny everything else
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }
