@@ -6,8 +6,7 @@ import { Link } from '@/i18n/routing';
 import { api } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import Badge from '@/components/ui/Badge';
-import { Plus, FileText, MoreVertical, Trash2, Copy, Pencil, Sparkles, AlertTriangle } from 'lucide-react';
+import { Plus, FileText, Trash2, Copy, Pencil, Sparkles, AlertTriangle } from 'lucide-react';
 import Skeleton from '@/components/ui/Skeleton';
 import { CV, PLAN_CONFIGS } from '@flacroncv/shared-types';
 import { formatDate } from '@/lib/utils';
@@ -172,13 +171,17 @@ function CVCard({
   onDuplicate: () => void;
   duplicating?: boolean;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
   const router = useRouter();
 
   return (
-    <Card hover padding="none" className="overflow-hidden">
-      {/* Preview area */}
-      <div className="flex h-40 items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100 dark:from-stone-800 dark:to-stone-900">
+    <Card padding="none" className="group overflow-hidden transition-shadow hover:shadow-md">
+      {/* Clickable preview area */}
+      <button
+        className="relative flex h-40 w-full items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100 dark:from-stone-800 dark:to-stone-900"
+        onClick={() => router.push(`/cv/${cv.id}`)}
+        aria-label={`Open ${cv.title}`}
+      >
+        {/* Mini CV mockup */}
         <div className="w-24 rounded border border-stone-200 bg-white p-2 shadow-sm dark:border-stone-600 dark:bg-stone-700">
           <div className="mb-1 h-2 w-14 rounded bg-stone-800 dark:bg-stone-200" />
           <div className="mb-1 h-1 w-10 rounded bg-stone-300" />
@@ -189,59 +192,45 @@ function CVCard({
             <div className="h-1 w-3/5 rounded bg-stone-200 dark:bg-stone-500" />
           </div>
         </div>
-      </div>
+        {/* Hover overlay */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-all group-hover:bg-black/20">
+          <span className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-sm font-medium text-stone-800 opacity-0 shadow transition-opacity group-hover:opacity-100">
+            <Pencil className="h-3.5 w-3.5" /> Open Editor
+          </span>
+        </div>
+      </button>
 
       {/* Info */}
       <div className="p-4">
-        <div className="flex items-start justify-between">
-          <div className="min-w-0 flex-1">
-            <Link href={`/cv/${cv.id}`}>
-              <h3 className="truncate font-semibold text-stone-900 hover:text-brand-600 dark:text-white">
-                {cv.title}
-              </h3>
-            </Link>
-            <p className="mt-1 text-xs text-stone-500">
-              Updated {formatDate(cv.updatedAt)}
-            </p>
-          </div>
-          <div className="relative">
-            <button
-              className="rounded-lg p-1 text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-700"
-              onClick={() => setMenuOpen(!menuOpen)}
-            >
-              <MoreVertical className="h-4 w-4" />
-            </button>
-            {menuOpen && (
-              <>
-                <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                <div className="absolute end-0 z-20 mt-1 w-36 rounded-lg border border-stone-200 bg-white py-1 shadow-lg dark:border-stone-700 dark:bg-stone-800">
-                  <button
-                    className="flex w-full items-center gap-2 px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-50 dark:text-stone-400 dark:hover:bg-stone-700"
-                    onClick={() => { setMenuOpen(false); router.push(`/cv/${cv.id}`); }}
-                  >
-                    <Pencil className="h-4 w-4" /> Edit
-                  </button>
-                  <button
-                    className="flex w-full items-center gap-2 px-3 py-1.5 text-sm text-stone-600 hover:bg-stone-50 dark:text-stone-400 dark:hover:bg-stone-700"
-                    onClick={() => { onDuplicate(); setMenuOpen(false); }}
-                    disabled={duplicating}
-                  >
-                    <Copy className="h-4 w-4" /> Duplicate
-                  </button>
-                  <button
-                    className="flex w-full items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
-                    onClick={() => { onDelete(); setMenuOpen(false); }}
-                  >
-                    <Trash2 className="h-4 w-4" /> Delete
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
+        <div className="mb-3">
+          <h3 className="truncate font-semibold text-stone-900 dark:text-white">{cv.title}</h3>
+          <p className="mt-0.5 text-xs text-stone-500 dark:text-stone-400">
+            Updated {formatDate(cv.updatedAt)}
+          </p>
         </div>
-        <div className="mt-3 flex items-center gap-2">
-          <Badge variant={cv.status === 'published' ? 'success' : 'default'}>{cv.status}</Badge>
-          <Badge variant="info">{cv.templateId}</Badge>
+
+        {/* Action buttons — always visible */}
+        <div className="flex items-center gap-2">
+          <button
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-stone-200 py-1.5 text-sm font-medium text-stone-700 hover:border-brand-400 hover:text-brand-600 dark:border-stone-700 dark:text-stone-300 dark:hover:border-brand-500 dark:hover:text-brand-400"
+            onClick={() => router.push(`/cv/${cv.id}`)}
+          >
+            <Pencil className="h-3.5 w-3.5" /> Edit
+          </button>
+          <button
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-stone-200 py-1.5 text-sm font-medium text-stone-700 hover:border-stone-300 dark:border-stone-700 dark:text-stone-300"
+            onClick={onDuplicate}
+            disabled={duplicating}
+          >
+            <Copy className="h-3.5 w-3.5" /> Duplicate
+          </button>
+          <button
+            className="flex items-center justify-center rounded-lg border border-stone-200 p-1.5 text-stone-400 hover:border-red-300 hover:bg-red-50 hover:text-red-600 dark:border-stone-700 dark:hover:border-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+            onClick={onDelete}
+            aria-label="Delete CV"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </Card>
