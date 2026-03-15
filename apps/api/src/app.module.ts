@@ -26,8 +26,14 @@ import configuration from './config/configuration';
     }),
     ThrottlerModule.forRoot([
       {
+        name: 'default',
         ttl: 60000,
         limit: 100,
+      },
+      {
+        name: 'auth',
+        ttl: 900000, // 15 minutes
+        limit: 10,
       },
     ]),
     ScheduleModule.forRoot(),

@@ -1,0 +1,162 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users.") {
+  user_insertMany(
+    data: [
+      {
+        id: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        authId: "firebase-uid-1",
+        email: "john.doe@example.com",
+        displayName: "John Doe",
+        photoUrl: "https://example.com/john.jpg",
+        createdAt: "2023-01-01T10:00:00Z"
+      },
+      {
+        id: "b1f0eebc-9c0b-4ef8-bb6d-6bb9bd380a22",
+        authId: "firebase-uid-2",
+        email: "jane.smith@example.com",
+        displayName: "Jane Smith",
+        photoUrl: "https://example.com/jane.jpg",
+        createdAt: "2023-01-02T11:00:00Z"
+      }
+    ]
+  )
+  profile_insertMany(
+    data: [
+      {
+        id: "c2g1hijk-lmn0-opqr-stuv-wxyz12345678",
+        userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        name: "John Doe's Profile",
+        contactEmail: "john.doe.profile@example.com",
+        phoneNumber: "123-456-7890",
+        linkedinUrl: "https://linkedin.com/in/johndoe",
+        portfolioUrl: "https://johndoe.com",
+        address: "123 Main St, Anytown, USA",
+        summary: "Experienced software engineer with a passion for web development.",
+        createdAt: "2023-01-01T10:30:00Z"
+      },
+      {
+        id: "d3e2fghi-jkl1-mnop-qrst-uvwx12345678",
+        userId: "b1f0eebc-9c0b-4ef8-bb6d-6bb9bd380a22",
+        name: "Jane Smith's Profile",
+        contactEmail: "jane.smith.profile@example.com",
+        phoneNumber: "987-654-3210",
+        linkedinUrl: "https://linkedin.com/in/janesmith",
+        portfolioUrl: "https://janesmith.com",
+        address: "456 Oak Ave, Otherville, USA",
+        summary: "Creative graphic designer with a focus on user experience.",
+        createdAt: "2023-01-02T11:30:00Z"
+      }
+    ]
+  )
+  experience_insertMany(
+    data: [
+      {
+        profileId: "c2g1hijk-lmn0-opqr-stuv-wxyz12345678",
+        title: "Senior Software Engineer",
+        company: "Tech Solutions Inc.",
+        startDate: "2020-03-01",
+        endDate: "2023-01-31",
+        description: "Developed and maintained web applications using React and Node.js."
+      },
+      {
+        profileId: "c2g1hijk-lmn0-opqr-stuv-wxyz12345678",
+        title: "Software Engineer",
+        company: "Web Innovations LLC",
+        startDate: "2018-06-01",
+        endDate: "2020-02-28",
+        description: "Contributed to the development of e-commerce platforms."
+      },
+      {
+        profileId: "d3e2fghi-jkl1-mnop-qrst-uvwx12345678",
+        title: "Lead Graphic Designer",
+        company: "Creative Designs Co.",
+        startDate: "2019-09-01",
+        endDate: null,
+        description: "Managed design projects and mentored junior designers."
+      }
+    ]
+  )
+  education_insertMany(
+    data: [
+      {
+        profileId: "c2g1hijk-lmn0-opqr-stuv-wxyz12345678",
+        institution: "University of Technology",
+        degree: "Master of Science in Computer Science",
+        startDate: "2017-09-01",
+        endDate: "2019-05-31",
+        gpa: 3.8,
+        honors: "Magna Cum Laude"
+      },
+      {
+        profileId: "c2g1hijk-lmn0-opqr-stuv-wxyz12345678",
+        institution: "State University",
+        degree: "Bachelor of Science in Software Engineering",
+        startDate: "2013-09-01",
+        endDate: "2017-05-31",
+        gpa: 3.7
+      },
+      {
+        profileId: "d3e2fghi-jkl1-mnop-qrst-uvwx12345678",
+        institution: "Art Institute",
+        degree: "Bachelor of Fine Arts in Graphic Design",
+        startDate: "2015-09-01",
+        endDate: "2019-05-31",
+        gpa: 3.9,
+        honors: "Summa Cum Laude"
+      }
+    ]
+  )
+  skill_insertMany(
+    data: [
+      {
+        profileId: "c2g1hijk-lmn0-opqr-stuv-wxyz12345678",
+        name: "React",
+        category: "Frontend Development",
+        proficiencyLevel: "Expert"
+      },
+      {
+        profileId: "c2g1hijk-lmn0-opqr-stuv-wxyz12345678",
+        name: "Node.js",
+        category: "Backend Development",
+        proficiencyLevel: "Advanced"
+      },
+      {
+        profileId: "d3e2fghi-jkl1-mnop-qrst-uvwx12345678",
+        name: "Adobe Photoshop",
+        category: "Graphic Design",
+        proficiencyLevel: "Expert"
+      },
+      {
+        profileId: "d3e2fghi-jkl1-mnop-qrst-uvwx12345678",
+        name: "Figma",
+        category: "UI/UX Design",
+        proficiencyLevel: "Advanced"
+      }
+    ]
+  )
+  document_insertMany(
+    data: [
+      {
+        userId: "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+        profileId: "c2g1hijk-lmn0-opqr-stuv-wxyz12345678",
+        type: "Resume",
+        language: "English",
+        name: "John Doe Resume",
+        content: "Detailed resume of John Doe, highlighting 5 years of experience...",
+        createdAt: "2023-02-01T09:00:00Z",
+        jobTitle: "Software Engineer",
+        companyName: "Tech Solutions Inc."
+      },
+      {
+        userId: "b1f0eebc-9c0b-4ef8-bb6d-6bb9bd380a22",
+        profileId: "d3e2fghi-jkl1-mnop-qrst-uvwx12345678",
+        type: "Cover Letter",
+        language: "English",
+        name: "Jane Smith Cover Letter",
+        content: "Cover letter from Jane Smith, expressing interest in a Lead Designer role...",
+        createdAt: "2023-02-02T09:30:00Z",
+        jobTitle: "Lead Graphic Designer",
+        companyName: "Creative Designs Co."
+      }
+    ]
+  )
+}

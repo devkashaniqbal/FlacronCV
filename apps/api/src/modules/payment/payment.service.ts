@@ -99,10 +99,13 @@ export class PaymentService {
         this.logger.log(`Unhandled event type: ${event.type}`);
     }
 
-    // Mark event as processed
+    // Mark event as processed — expireAt causes Firestore TTL to auto-delete after 90 days
+    const processedAt = new Date();
+    const expireAt = new Date(processedAt.getTime() + 90 * 24 * 60 * 60 * 1000);
     await this.firebaseAdmin.firestore.collection('payment_events').doc(event.id).set({
       type: event.type,
-      processedAt: new Date(),
+      processedAt,
+      expireAt,
       data: JSON.parse(JSON.stringify(event.data.object)),
     });
   }
@@ -115,18 +118,25 @@ export class PaymentService {
     const plan = this.determinePlan(subscription.items.data[0].price.id);
     const limits = PLAN_CONFIGS[plan].limits;
 
-    await this.usersService.updateSubscription(userId, {
-      plan,
-      status: SubscriptionStatus.ACTIVE,
-      stripeSubscriptionId: subscription.id,
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-      cancelAtPeriodEnd: false,
+    const db = this.firebaseAdmin.firestore;
+    const userRef = db.collection('users').doc(userId);
+    const subscriptionRef = db.collection('subscriptions').doc(subscription.id);
+    const now = new Date();
+
+    // Atomic batch: user plan update + subscription record creation
+    const batch = db.batch();
+
+    batch.update(userRef, {
+      'subscription.plan': plan,
+      'subscription.status': SubscriptionStatus.ACTIVE,
+      'subscription.stripeSubscriptionId': subscription.id,
+      'subscription.currentPeriodEnd': new Date(subscription.current_period_end * 1000),
+      'subscription.cancelAtPeriodEnd': false,
+      'usage.aiCreditsLimit': limits.aiCredits,
+      updatedAt: now,
     });
 
-    await this.usersService.updateUsage(userId, { aiCreditsLimit: limits.aiCredits });
-
-    // Store subscription record
-    await this.firebaseAdmin.firestore.collection('subscriptions').doc(subscription.id).set({
+    batch.set(subscriptionRef, {
       id: subscription.id,
       userId,
       stripeCustomerId: session.customer as string,
@@ -143,10 +153,11 @@ export class PaymentService {
       trialStart: null,
       trialEnd: null,
       cancelAtPeriodEnd: false,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: now,
+      updatedAt: now,
     });
 
+    await batch.commit();
     this.logger.log(`Subscription created for user ${userId}: ${plan}`);
   }
 

@@ -1,0 +1,58 @@
+type User @table {
+  authId: String!
+  email: String!
+  createdAt: Timestamp!
+  displayName: String
+  photoUrl: String
+}
+
+type Profile @table {
+  user: User!
+  name: String!
+  createdAt: Timestamp!
+  contactEmail: String
+  phoneNumber: String
+  linkedinUrl: String
+  portfolioUrl: String
+  address: String
+  summary: String
+}
+
+type Experience @table {
+  profile: Profile!
+  title: String!
+  company: String!
+  startDate: Date!
+  description: String!
+  endDate: Date
+}
+
+type Education @table {
+  profile: Profile!
+  institution: String!
+  degree: String!
+  startDate: Date!
+  endDate: Date
+  gpa: Float
+  honors: String
+}
+
+type Skill @table {
+  profile: Profile!
+  name: String!
+  category: String!
+  proficiencyLevel: String
+}
+
+type Document @table {
+  user: User!
+  profile: Profile!
+  type: String!
+  language: String!
+  name: String!
+  content: String!
+  createdAt: Timestamp!
+  templateId: UUID
+  jobTitle: String
+  companyName: String
+}

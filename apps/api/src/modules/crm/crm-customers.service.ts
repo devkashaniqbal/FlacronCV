@@ -102,7 +102,7 @@ export class CRMCustomersService {
       query = query.where('createdAt', '<=', new Date(params.endDate));
     }
 
-    const snapshot = await query.get();
+    const snapshot = await query.limit(1000).get();
     let items: CRMCustomer[] = snapshot.docs.map((d: any) => d.data() as CRMCustomer);
 
     // In-memory search (Firestore doesn't support full-text)

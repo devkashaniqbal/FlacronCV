@@ -6,6 +6,7 @@ import {
   Body,
   Query,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
@@ -15,6 +16,7 @@ import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser, FirebaseUser } from '../../common/decorators/current-user.decorator';
+import { UpdateUserData, SupportTicket, UserRole } from '@flacroncv/shared-types';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -49,18 +51,22 @@ export class AdminController {
   }
 
   @Patch('users/:id')
-  async updateUser(@Param('id') id: string, @Body() data: Record<string, unknown>) {
-    return this.usersService.update(id, data as any);
+  async updateUser(@Param('id') id: string, @Body() data: UpdateUserData) {
+    return this.usersService.update(id, data);
   }
 
   @Get('tickets')
-  async listTickets(@Query('status') status?: string) {
-    return this.supportService.listAll(status);
+  async listTickets(
+    @Query('status') status?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.supportService.listAll(status, page || 1, limit || 20);
   }
 
   @Patch('tickets/:id')
-  async updateTicket(@Param('id') id: string, @Body() data: Record<string, unknown>) {
-    return this.supportService.updateTicket(id, data as any);
+  async updateTicket(@Param('id') id: string, @Body() data: Partial<SupportTicket>) {
+    return this.supportService.updateTicket(id, data);
   }
 
   @Get('audit-logs')

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, UseGuards, ForbiddenException } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { SupportService } from './support.service';
 import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
@@ -23,8 +23,9 @@ export class SupportController {
   }
 
   @Get('tickets/:id')
-  async getTicket(@Param('id') id: string) {
+  async getTicket(@CurrentUser() user: FirebaseUser, @Param('id') id: string) {
     const ticket = await this.supportService.getTicket(id);
+    if (ticket.userId !== user.uid) throw new ForbiddenException('Access denied');
     const messages = await this.supportService.getMessages(id);
     return { ticket, messages };
   }
@@ -35,11 +36,15 @@ export class SupportController {
     @Param('id') id: string,
     @Body() body: { content: string },
   ) {
+    const ticket = await this.supportService.getTicket(id);
+    if (ticket.userId !== user.uid) throw new ForbiddenException('Access denied');
     return this.supportService.addMessage(id, user.uid, user.email, 'user', body.content);
   }
 
   @Patch('tickets/:id/close')
-  async close(@Param('id') id: string) {
+  async close(@CurrentUser() user: FirebaseUser, @Param('id') id: string) {
+    const ticket = await this.supportService.getTicket(id);
+    if (ticket.userId !== user.uid) throw new ForbiddenException('Access denied');
     return this.supportService.closeTicket(id);
   }
 }

@@ -9,10 +9,27 @@ import * as path from 'path';
 import * as fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
+// Simple semaphore to cap concurrent Puppeteer processes
+class Semaphore {
+  private queue: Array<() => void> = [];
+  private running = 0;
+  constructor(private readonly max: number) {}
+  async acquire(): Promise<void> {
+    if (this.running < this.max) { this.running++; return; }
+    return new Promise((resolve) => this.queue.push(resolve));
+  }
+  release(): void {
+    this.running--;
+    const next = this.queue.shift();
+    if (next) { this.running++; next(); }
+  }
+}
+
 @Injectable()
 export class ExportService {
   private readonly logger = new Logger(ExportService.name);
   private templates: Map<string, Handlebars.TemplateDelegate> = new Map();
+  private readonly exportSemaphore = new Semaphore(3); // max 3 concurrent Puppeteer instances
 
   constructor(
     private firebaseAdmin: FirebaseAdminService,
@@ -29,6 +46,15 @@ export class ExportService {
     if (limits.exports !== 'unlimited' && user.usage.exportsThisMonth >= limits.exports) {
       throw new ForbiddenException(
         `Export limit reached for your plan (${limits.exports}/month). Please upgrade.`,
+      );
+    }
+  }
+
+  private async checkDocxAccess(userId: string): Promise<void> {
+    const user = await this.usersService.findByIdOrThrow(userId);
+    if (user.subscription.plan === 'free') {
+      throw new ForbiddenException(
+        'DOCX export is not available on the free plan. Please upgrade to Pro or Enterprise.',
       );
     }
   }
@@ -60,7 +86,8 @@ export class ExportService {
     // Build HTML from template
     const html = this.renderCVHTML(cv, sections);
 
-    // Use Puppeteer for PDF generation
+    // Use Puppeteer for PDF generation — semaphore caps concurrent instances
+    await this.exportSemaphore.acquire();
     const puppeteer = await import('puppeteer');
     const browser = await puppeteer.default.launch({
       headless: true,
@@ -69,7 +96,7 @@ export class ExportService {
 
     try {
       const page = await browser.newPage();
-      await page.setContent(html, { waitUntil: 'networkidle0' });
+      await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
 
       const pdfBuffer = await page.pdf({
         format: 'A4',
@@ -94,10 +121,12 @@ export class ExportService {
       return { downloadUrl: url, expiresAt: new Date(Date.now() + 60 * 60 * 1000) };
     } finally {
       await browser.close();
+      this.exportSemaphore.release();
     }
   }
 
   async exportCVToDocx(cvId: string, userId: string): Promise<{ downloadUrl: string; expiresAt: Date }> {
+    await this.checkDocxAccess(userId);
     await this.checkExportLimit(userId);
     const cv = await this.cvService.findByIdOrThrow(cvId, userId);
     const sections = await this.cvService.getSections(cvId);
@@ -284,7 +313,8 @@ export class ExportService {
     // Build HTML from cover letter
     const html = this.renderCoverLetterHTML(coverLetter);
 
-    // Use Puppeteer for PDF generation
+    // Use Puppeteer for PDF generation — semaphore caps concurrent instances
+    await this.exportSemaphore.acquire();
     const puppeteer = await import('puppeteer');
     const browser = await puppeteer.default.launch({
       headless: true,
@@ -293,7 +323,7 @@ export class ExportService {
 
     try {
       const page = await browser.newPage();
-      await page.setContent(html, { waitUntil: 'networkidle0' });
+      await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
 
       const pdfBuffer = await page.pdf({
         format: 'A4',
@@ -318,10 +348,12 @@ export class ExportService {
       return { downloadUrl: url, expiresAt: new Date(Date.now() + 60 * 60 * 1000) };
     } finally {
       await browser.close();
+      this.exportSemaphore.release();
     }
   }
 
   async exportCoverLetterToDocx(coverLetterId: string, userId: string): Promise<{ downloadUrl: string; expiresAt: Date }> {
+    await this.checkDocxAccess(userId);
     await this.checkExportLimit(userId);
     const coverLetter = await this.coverLetterService.findByIdOrThrow(coverLetterId, userId);
 

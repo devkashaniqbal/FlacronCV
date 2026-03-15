@@ -1,4 +1,4 @@
-import { Controller, Post, Req, Headers, HttpCode, HttpStatus, Logger } from '@nestjs/common';
+import { Controller, Post, Req, Headers, HttpCode, HttpStatus, Logger, BadRequestException } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { Request } from 'express';
@@ -18,16 +18,23 @@ export class StripeWebhookController {
   ) {
     if (!request.rawBody) {
       this.logger.error('Raw body not available for webhook');
-      return { received: false };
+      throw new BadRequestException('Missing raw body');
+    }
+
+    let event: ReturnType<PaymentService['constructEvent']>;
+    try {
+      event = this.paymentService.constructEvent(request.rawBody, signature);
+    } catch (error) {
+      this.logger.error(`Webhook signature verification failed: ${(error as Error).message}`);
+      throw new BadRequestException('Invalid webhook signature');
     }
 
     try {
-      const event = this.paymentService.constructEvent(request.rawBody, signature);
       await this.paymentService.handleWebhookEvent(event);
       return { received: true };
     } catch (error) {
-      this.logger.error(`Webhook error: ${(error as Error).message}`);
-      return { received: false, error: (error as Error).message };
+      this.logger.error(`Webhook processing error: ${(error as Error).message}`, (error as Error).stack);
+      throw new BadRequestException('Webhook processing failed');
     }
   }
 }

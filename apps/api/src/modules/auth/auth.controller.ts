@@ -1,10 +1,12 @@
-import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, HttpCode, HttpStatus, BadRequestException } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { FirebaseAuthGuard } from '../../common/guards/firebase-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser, FirebaseUser } from '../../common/decorators/current-user.decorator';
+import { UserRole } from '@flacroncv/shared-types';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -26,6 +28,7 @@ export class AuthController {
   }
 
   @Post('reset-password')
+  @Throttle({ auth: { limit: 5, ttl: 900000 } })
   @HttpCode(HttpStatus.OK)
   async resetPassword(@Body() body: { email: string }) {
     await this.authService.sendPasswordReset(body.email);
@@ -47,7 +50,11 @@ export class AuthController {
   @ApiBearerAuth()
   @HttpCode(HttpStatus.OK)
   async setClaims(@Body() body: { uid: string; role: string }) {
-    await this.authService.setUserRole(body.uid, body.role as any);
+    const validRoles = Object.values(UserRole) as string[];
+    if (!validRoles.includes(body.role)) {
+      throw new BadRequestException(`Invalid role. Must be one of: ${validRoles.join(', ')}`);
+    }
+    await this.authService.setUserRole(body.uid, body.role as UserRole);
     return { message: `Role ${body.role} set for user ${body.uid}` };
   }
 

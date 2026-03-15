@@ -53,15 +53,22 @@ export class SupportService {
     return snapshot.docs.map((doc: any) => doc.data() as SupportTicket);
   }
 
-  async listAll(status?: string) {
+  async listAll(status?: string, page = 1, limit = 20): Promise<{ items: SupportTicket[]; total: number; page: number; limit: number }> {
+    const safeLimit = Math.min(limit, 100);
     let query: FirebaseFirestore.Query = this.firebaseAdmin.firestore
       .collection(this.collection)
       .orderBy('createdAt', 'desc');
 
     if (status) query = query.where('status', '==', status);
 
-    const snapshot = await query.get();
-    return snapshot.docs.map((doc) => doc.data() as SupportTicket);
+    const countSnap = await query.count().get();
+    const total = countSnap.data().count;
+
+    const offset = (page - 1) * safeLimit;
+    const snapshot = await query.offset(offset).limit(safeLimit).get();
+    const items = snapshot.docs.map((doc) => doc.data() as SupportTicket);
+
+    return { items, total, page, limit: safeLimit };
   }
 
   async addMessage(ticketId: string, authorId: string, authorName: string, authorRole: 'user' | 'admin', content: string): Promise<TicketMessage> {

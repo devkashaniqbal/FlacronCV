@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, usePathname } from 'next/navigation';
 import { useAuth } from '@/providers/AuthProvider';
 import { api } from '@/lib/api';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -33,10 +33,15 @@ export default function BillingPage() {
   const t = useTranslations('billing');
   const { user, refreshUser } = useAuth();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const locale = pathname.split('/')[1] || 'en';
   const [billingInterval, setBillingInterval] = useState<'monthly' | 'yearly'>('monthly');
   const [syncingPlan, setSyncingPlan] = useState(false);
   const [syncSuccess, setSyncSuccess] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Keep a ref to the latest user so the polling interval doesn't read a stale closure
+  const userRef = useRef(user);
+  useEffect(() => { userRef.current = user; }, [user]);
 
   // After Stripe redirects back with ?success=true, poll until plan updates
   useEffect(() => {
@@ -55,7 +60,7 @@ export default function BillingPage() {
     pollRef.current = setInterval(async () => {
       attempts++;
       await refreshUser();
-      const latestPlan = user?.subscription?.plan ?? 'free';
+      const latestPlan = userRef.current?.subscription?.plan ?? 'free';
       if (latestPlan !== 'free' || attempts >= MAX_ATTEMPTS) {
         clearInterval(pollRef.current!);
         setSyncingPlan(false);
@@ -88,8 +93,8 @@ export default function BillingPage() {
 
       return api.post<{ url: string }>('/payments/create-checkout-session', {
         priceId,
-        successUrl: `${window.location.origin}/settings/billing?success=true`,
-        cancelUrl: `${window.location.origin}/settings/billing?canceled=true`,
+        successUrl: `${window.location.origin}/${locale}/settings/billing?success=true`,
+        cancelUrl: `${window.location.origin}/${locale}/settings/billing?canceled=true`,
       });
     },
     onSuccess: (data) => {
@@ -177,14 +182,26 @@ export default function BillingPage() {
 
   const plans = [
     { key: SubscriptionPlan.FREE, price: '$0', period: t('plans.free') },
-    { key: SubscriptionPlan.PRO, price: '$12', period: t('plans.perMonth') },
-    { key: SubscriptionPlan.ENTERPRISE, price: '$29', period: t('plans.perMonth') },
+    {
+      key: SubscriptionPlan.PRO,
+      price: billingInterval === 'yearly'
+        ? `$${(PLAN_CONFIGS[SubscriptionPlan.PRO].priceYearly / 12).toFixed(2)}`
+        : `$${PLAN_CONFIGS[SubscriptionPlan.PRO].priceMonthly}`,
+      period: t('plans.perMonth'),
+    },
+    {
+      key: SubscriptionPlan.ENTERPRISE,
+      price: billingInterval === 'yearly'
+        ? `$${(PLAN_CONFIGS[SubscriptionPlan.ENTERPRISE].priceYearly / 12).toFixed(2)}`
+        : `$${PLAN_CONFIGS[SubscriptionPlan.ENTERPRISE].priceMonthly}`,
+      period: t('plans.perMonth'),
+    },
   ];
 
   const comparisonFeatures = [
     {
       label: t('features.cvs'),
-      free: '1',
+      free: '5',
       pro: '10',
       enterprise: t('features.unlimited'),
     },

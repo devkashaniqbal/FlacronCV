@@ -1,0 +1,13 @@
+query GetMyProfile @auth(level: USER) {
+  profiles(where: {user: {authId: {eq_expr: "auth.uid"}}}) {
+    id
+    name
+    contactEmail
+    phoneNumber
+    linkedinUrl
+    portfolioUrl
+    address
+    summary
+    createdAt
+  }
+}

@@ -1,0 +1,252 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as Google from 'expo-auth-session/providers/google';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Link } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
+import React, { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { z } from 'zod';
+import { Button } from '../../src/components/ui/Button';
+import { Input } from '../../src/components/ui/Input';
+import { useAuthStore } from '../../src/store/auth-store';
+
+WebBrowser.maybeCompleteAuthSession();
+
+const schema = z
+  .object({
+    displayName: z.string().min(2, 'Name must be at least 2 characters'),
+    email: z.string().email('Please enter a valid email'),
+    password: z.string().min(8, 'Password must be at least 8 characters'),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.password === d.confirmPassword, {
+    message: "Passwords don't match",
+    path: ['confirmPassword'],
+  });
+
+type FormData = z.infer<typeof schema>;
+
+export default function RegisterScreen() {
+  const { register, loginWithGoogle, isLoading, error, clearError } = useAuthStore();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { displayName: '', email: '', password: '', confirmPassword: '' },
+  });
+
+  // Google Auth Session
+  const [, googleResponse, promptGoogleAsync] = Google.useIdTokenAuthRequest({
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || undefined,
+  });
+
+  useEffect(() => {
+    if (googleResponse?.type === 'success') {
+      const { id_token } = googleResponse.params;
+      loginWithGoogle(id_token).catch(() => {});
+    }
+  }, [googleResponse]);
+
+  const onSubmit = async (data: FormData) => {
+    clearError();
+    try {
+      await register(data.email, data.password, data.displayName);
+    } catch {
+      // Error in store
+    }
+  };
+
+  const onGooglePress = () => {
+    if (!process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID) {
+      Alert.alert(
+        'Google Sign-In',
+        'Google Sign-In requires a Web Client ID. Add EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID to your .env file (get it from Firebase Console → Authentication → Sign-in method → Google).',
+      );
+      return;
+    }
+    promptGoogleAsync();
+  };
+
+  return (
+    <SafeAreaView className="flex-1 bg-white">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        className="flex-1"
+      >
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Header */}
+          <LinearGradient colors={['#fff7ed', '#ffffff']} className="px-6 pt-8 pb-10">
+            <View className="items-center mb-8">
+              <View
+                className="w-14 h-14 rounded-2xl bg-brand-500 items-center justify-center mb-4"
+                style={{
+                  shadowColor: '#f97316',
+                  shadowOffset: { width: 0, height: 6 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 12,
+                  elevation: 6,
+                }}
+              >
+                <Image
+                  source={require('../../assets/logo.png')}
+                  style={{ width: 36, height: 36 }}
+                  resizeMode="contain"
+                />
+              </View>
+              <Text className="text-2xl font-black text-stone-900">Create account</Text>
+              <Text className="text-stone-500 mt-1">Start building your dream CV today</Text>
+            </View>
+          </LinearGradient>
+
+          {/* Form Card */}
+          <View className="px-6 -mt-4">
+            <View className="bg-white rounded-3xl border border-stone-100 shadow-sm p-6">
+              {/* Google Sign-Up — first option */}
+              <TouchableOpacity
+                onPress={onGooglePress}
+                activeOpacity={0.85}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 1.5,
+                  borderColor: '#e7e5e4',
+                  borderRadius: 14,
+                  paddingVertical: 14,
+                  gap: 10,
+                  backgroundColor: '#fff',
+                  marginBottom: 16,
+                }}
+              >
+                <Text style={{ fontSize: 16, fontWeight: '800', color: '#4285F4' }}>G</Text>
+                <Text style={{ color: '#1c1917', fontSize: 15, fontWeight: '600' }}>
+                  Sign up with Google
+                </Text>
+              </TouchableOpacity>
+
+              {/* Divider */}
+              <View className="flex-row items-center mb-5">
+                <View className="flex-1 h-px bg-stone-200" />
+                <Text className="mx-3 text-stone-400 text-sm font-medium">or with email</Text>
+                <View className="flex-1 h-px bg-stone-200" />
+              </View>
+
+              {/* Error Banner */}
+              {error && (
+                <View className="bg-red-50 border border-red-200 rounded-xl p-3 mb-4">
+                  <Text className="text-red-600 text-sm">{error}</Text>
+                </View>
+              )}
+
+              <Controller
+                control={control}
+                name="displayName"
+                render={({ field }) => (
+                  <Input
+                    label="Full Name"
+                    placeholder="John Doe"
+                    autoCapitalize="words"
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    error={errors.displayName?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="email"
+                render={({ field }) => (
+                  <Input
+                    label="Email Address"
+                    placeholder="you@example.com"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    error={errors.email?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <Input
+                    label="Password"
+                    placeholder="Min. 8 characters"
+                    isPassword
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    error={errors.password?.message}
+                  />
+                )}
+              />
+
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field }) => (
+                  <Input
+                    label="Confirm Password"
+                    placeholder="Repeat password"
+                    isPassword
+                    value={field.value}
+                    onChangeText={field.onChange}
+                    error={errors.confirmPassword?.message}
+                  />
+                )}
+              />
+
+              <Text className="text-xs text-stone-400 mb-5 leading-4">
+                By creating an account you agree to our{' '}
+                <Text className="text-brand-500">Terms of Service</Text> and{' '}
+                <Text className="text-brand-500">Privacy Policy</Text>.
+              </Text>
+
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                loading={isLoading}
+                onPress={handleSubmit(onSubmit)}
+              >
+                Create Account
+              </Button>
+            </View>
+
+            {/* Login Link */}
+            <View className="flex-row justify-center mt-6 mb-8">
+              <Text className="text-stone-500">Already have an account? </Text>
+              <Link href="/(auth)/login" asChild>
+                <TouchableOpacity>
+                  <Text className="text-brand-500 font-semibold">Sign in</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
